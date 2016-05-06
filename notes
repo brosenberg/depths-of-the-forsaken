@@ -1,0 +1,27 @@
+Combat is on a 1-dimensional line between 2 opponents.
+Different attacks have different amounts of reach
+Action points
+Movement: 1 AP = 1 foot of movement
+Number of AP = 2x Dexterity
+
+
+
+Stats:
+Str Dex Con Wis Int Cha
+Spell Points = 2*Int
+Action Points = 2*Dex
+HP = Con
+Piety = Wis Mod
+
+Skills:
+Stealth
+Perception
+Knowledge
+Medicine
+Craft
+Sorcery
+Lockpick
+
+Abilities:
+Nonlethal Fighting
+Takedowns
