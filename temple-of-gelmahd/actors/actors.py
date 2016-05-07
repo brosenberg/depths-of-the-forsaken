@@ -71,7 +71,7 @@ class Actor(object):
         self.stats["fatigue_cur"] = self.stats["fatigue_max"]
 
     def get_state(self):
-        s = "%s: %d/%d HP  %d/%d Fatigue  %d/%d AP  %d/%d SP" % (self.name,
+        s = "%s: HP %d/%d  Fatigue %d/%d  AP %d/%d  SP %d/%d" % (self.name,
             self.stats["hp_cur"], self.stats["hp_max"], self.stats["fatigue_cur"], self.stats["fatigue_max"], self.stats["ap_cur"], self.stats["ap_max"], self.stats["sp_cur"], self.stats["sp_max"])
         return s
 
@@ -87,6 +87,7 @@ class Actor(object):
             s += "severely injured"
         else:
             s += "near death"
+        s += "."
         return s
 
     def load(self, s):

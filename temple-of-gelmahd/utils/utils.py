@@ -17,6 +17,17 @@ def color_text(color, text):
     else:
         return text
 
+def get_expected_input(expected, prompt=None):
+    s = ""
+    while s.lower() not in expected:
+        if prompt:
+            print prompt,
+        try:
+            s = raw_input("> ")
+        except EOFError:
+            pass
+    return s
+
 def oppose(attacker, defender, attack_stat, defend_stat):
     attack = roll(100) + stat_modp(attacker.stats[attack_stat]) + attacker.stats["luck"]
     defend = roll(100) + stat_modp(defender.stats[defend_stat]) + defender.stats["luck"]

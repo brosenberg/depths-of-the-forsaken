@@ -76,28 +76,29 @@ class Combat(object):
     def print_player_status(self):
         print self.player.get_state()
         print self.opponent.get_fuzzy_state()
-        print "You are %d feet from the %s." % (self.distance, self.opponent.display_name)
+        if self.distance == 1:
+            print "You are 1 foot from the %s." % (self.opponent.display_name,)
+        else:
+            print "You are %d feet from the %s." % (self.distance, self.opponent.display_name)
 
     def main_loop(self):
         turn = 2
         while not self.combat_complete:
+
             if turn%2 == 0:
                 print utils.color_text('cyan', "Turn %d  %s" % (turn/2, "-"*20))
+
             if self.player_turn:
                 while self.player.stats["ap_cur"] > 0 and not self.combat_complete:
                     self.print_player_status()
-                    player_action = ""
-                    while player_action.lower() not in self.player.actions:
-                        print "Which action will you perform?"
-                        for action in self.player.actions:
-                            print "\t%s: %d AP" % (action, self.player.actions[action])
-                        try:
-                            player_action = raw_input("> ")
-                        except EOFError:
-                            pass
+                    prompt = "Which action will you perform?\n"
+                    for action in self.player.actions:
+                        prompt += "\t%8s %2d AP\n" % ("%s:"%(action,), self.player.actions[action])
+                    player_action = utils.get_expected_input(self.player.actions, prompt)
                     action_output = self.do_action(self.player, self.opponent, player_action)
                     print utils.color_text('yellow', action_output)
                 self.player.stats["ap_cur"] = self.player.stats["ap_max"]
+
             else:
                 while self.opponent.stats["ap_cur"] > 0 and not self.combat_complete:
                     action_output = ""
@@ -109,6 +110,7 @@ class Combat(object):
                         action_output = self.do_action(self.opponent, self.player, "wait")
                     print utils.color_text('red', action_output)
                 self.opponent.stats["ap_cur"] = self.opponent.stats["ap_max"]
+
             self.player_turn = not self.player_turn
             turn += 1
 

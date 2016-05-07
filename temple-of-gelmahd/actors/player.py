@@ -1,6 +1,8 @@
 import actors
 import json
 
+from utils import utils
+
 class Player(actors.Actor):
     def __init__(self, name, stats=None):
         super(self.__class__, self).__init__(name, stats=stats)
@@ -33,16 +35,17 @@ def chargen():
         stats[stat] = ""
     while values:
         value = values.pop(0)
-        chosen_stat = ""
-        while chosen_stat not in actors.BASE_STATS:
+        choosing = True
+        while choosing:
+            prompt = ""
             for stat in actors.BASE_STATS:
-                print "%s: %s  " % (stat.title(), stats[stat]),
-            print
-            print "Which stat would you like to assign the %d to?" % (value,)
-            chosen_stat = raw_input("> ").lower()
-            if chosen_stat in actors.BASE_STATS and  stats[chosen_stat] != "":
+                prompt += "%s: %s  " % (stat.title(), stats[stat])
+            prompt += "\nWhich stat would you like to assign the %d to?\n" % (value,)
+            chosen_stat = utils.get_expected_input(actors.BASE_STATS, prompt)
+            if stats[chosen_stat] != "":
                 print "That stat has already been assigned."
-                chosen_stat = ""
-        stats[chosen_stat] = value
+            else:
+                choosing = False
+                stats[chosen_stat] = value
     pc = Player(name, stats=stats)
     return pc
