@@ -28,6 +28,21 @@ def get_expected_input(expected, prompt=None):
             pass
     return s
 
+def get_yesno_input(prompt=None):
+    s = ""
+    if prompt:
+        print prompt,
+    else:
+        print "(y)es or (n)o?"
+    try:
+        s = raw_input("> ")
+    except EOFError:
+        return False
+    if s.lower() == "y" or s.lower() == "yes":
+        return True
+    else:
+        return False
+
 def oppose(attacker, defender, attack_stat, defend_stat):
     attack = roll(100) + stat_modp(attacker.stats[attack_stat]) + attacker.stats["luck"]
     defend = roll(100) + stat_modp(defender.stats[defend_stat]) + defender.stats["luck"]

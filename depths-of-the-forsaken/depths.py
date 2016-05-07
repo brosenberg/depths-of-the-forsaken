@@ -33,10 +33,13 @@ def main():
     fight.main_loop()
     if pc.stats["hp_cur"] < 1:
         print "Would you like to load your game?"
-        load_game(pc)
+        if utils.get_yesno_input():
+            load_game(pc)
     else:
         print "Would you like to save your game?"
-        save_game(pc)
+        if utils.get_yesno_input():
+            save_game(pc)
+    print "Good bye!"
 
 if __name__ == '__main__':
     main()
