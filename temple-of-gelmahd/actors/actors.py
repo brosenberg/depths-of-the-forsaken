@@ -63,11 +63,3 @@ class Actor(object):
         else:
             s += "near death"
         return s
-
-def verify_actors(actors):
-    for actor in actors:
-        if type(actor) is not Actor:
-            raise BadActorException
-
-class BadActorException(Exception):
-    pass

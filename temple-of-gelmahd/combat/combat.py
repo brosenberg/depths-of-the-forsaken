@@ -4,10 +4,6 @@ from utils import utils
 
 class Combat(object):
     def __init__(self, player, opponent, distance=1):
-        if type(player) is not actors.Actor:
-            raise actors.BadActorException
-        if type(opponent) is not actors.Actor:
-            raise actors.BadActorException
         self.player = player
         self.opponent = opponent
         self.distance = distance
@@ -85,7 +81,7 @@ class Combat(object):
         turn = 2
         while not self.combat_complete:
             if turn%2 == 0:
-                print utils.color_text('green', "Turn %d  %s" % (turn/2, "-"*20))
+                print utils.color_text('cyan', "Turn %d  %s" % (turn/2, "-"*20))
             if self.player_turn:
                 while self.player.stats["ap_cur"] > 0 and not self.combat_complete:
                     self.print_player_status()
@@ -94,9 +90,12 @@ class Combat(object):
                         print "Which action will you perform?"
                         for action in self.player.actions:
                             print "\t%s: %d AP" % (action, self.player.actions[action])
-                        player_action = raw_input("> ")
+                        try:
+                            player_action = raw_input("> ")
+                        except EOFError:
+                            pass
                     action_output = self.do_action(self.player, self.opponent, player_action)
-                    print utils.color_text('red', action_output)
+                    print utils.color_text('yellow', action_output)
                 self.player.stats["ap_cur"] = self.player.stats["ap_max"]
             else:
                 while self.opponent.stats["ap_cur"] > 0 and not self.combat_complete:
@@ -107,7 +106,7 @@ class Combat(object):
                         action_output = self.do_action(self.opponent, self.player, "attack")
                     else:
                         action_output = self.do_action(self.opponent, self.player, "wait")
-                    print utils.color_text('yellow', action_output)
+                    print utils.color_text('red', action_output)
                 self.opponent.stats["ap_cur"] = self.opponent.stats["ap_max"]
             self.player_turn = not self.player_turn
             turn += 1
@@ -115,4 +114,4 @@ class Combat(object):
         if self.opponent.stats["hp_cur"] < 1:
             print "%s has been slain." % (self.opponent.display_name,)
         else:
-            print "You have died."
+            print "%s has been slain." % (self.player.display_name,)

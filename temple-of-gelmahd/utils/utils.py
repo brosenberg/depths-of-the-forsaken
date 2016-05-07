@@ -1,7 +1,5 @@
 import random
 
-from actors import actors
-
 COLORS = {
     'red': '\033[91m',
     'green': '\033[92m',
@@ -20,7 +18,6 @@ def color_text(color, text):
         return text
 
 def oppose(attacker, defender, attack_stat, defend_stat):
-    actors.verify_actors([attacker, defender])
     attack = roll(100) + stat_modp(attacker.stats[attack_stat])
     defend = roll(100) + stat_modp(defender.stats[defend_stat])
     if attack > defend:
