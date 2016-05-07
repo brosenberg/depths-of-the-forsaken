@@ -1,7 +1,9 @@
-BASE_STATS = ["str", "dex", "con", "wis", "int", "cha"]
+import json
+
+BASE_STATS = ["str", "dex", "con", "wis", "int", "cha", "luck"]
 
 class Actor(object):
-    def __init__(self, name, display_name=None):
+    def __init__(self, name, display_name=None, stats=None):
         self.name = name
         if display_name:
             self.display_name = display_name
@@ -9,19 +11,17 @@ class Actor(object):
             self.display_name = name
 
         self.level = 1
-        self.stats = {}
-        for stat in BASE_STATS:
-            self.stats[stat] = 10
+        if stats is not None:
+            for stat in BASE_STATS:
+                if stat not in stats:
+                    raise Exception("Stat '%s' undefined in actor!" % (stat,))
+            self.stats = stats
+        else:
+            self.stats = {}
+            for stat in BASE_STATS:
+                self.stats[stat] = 10
 
-        self.stats["ap_max"] = 2*self.stats["dex"]
-        self.stats["hp_max"] = self.stats["con"]
-        self.stats["sp_max"] = 2*self.stats["int"]
-        self.stats["fatigue_max"] = 2*self.stats["con"]
-
-        self.stats["ap_cur"] = self.stats["ap_max"]
-        self.stats["hp_cur"] = self.stats["hp_max"]
-        self.stats["sp_cur"] = self.stats["sp_max"]
-        self.stats["fatigue_cur"] = self.stats["fatigue_max"]
+        self._calculate_secondary_stats()
 
         self.weapon = None
         self.armor = None
@@ -45,6 +45,31 @@ class Actor(object):
         s += "\nWeapon: %s\nArmor: %s\n" % (self.weapon, self.armor)
         return s
 
+    def __repr__(self):
+        return json.dumps(self.pre_repr())
+
+    def pre_repr(self):
+        r = {}
+        r["actions"] = self.actions
+        r["display_name"] = self.display_name
+        r["level"] = self.level
+        r["name"] = self.name
+        r["stats"] = self.stats
+        r["weapon"] = self.weapon
+        r["armor"] = self.armor
+        return r
+
+    def _calculate_secondary_stats(self):
+        self.stats["ap_max"] = 2*self.stats["dex"]
+        self.stats["hp_max"] = self.stats["con"]
+        self.stats["sp_max"] = 2*self.stats["int"]
+        self.stats["fatigue_max"] = 2*self.stats["con"]
+
+        self.stats["ap_cur"] = self.stats["ap_max"]
+        self.stats["hp_cur"] = self.stats["hp_max"]
+        self.stats["sp_cur"] = self.stats["sp_max"]
+        self.stats["fatigue_cur"] = self.stats["fatigue_max"]
+
     def get_state(self):
         s = "%s: %d/%d HP  %d/%d Fatigue  %d/%d AP  %d/%d SP" % (self.name,
             self.stats["hp_cur"], self.stats["hp_max"], self.stats["fatigue_cur"], self.stats["fatigue_max"], self.stats["ap_cur"], self.stats["ap_max"], self.stats["sp_cur"], self.stats["sp_max"])
@@ -63,3 +88,13 @@ class Actor(object):
         else:
             s += "near death"
         return s
+
+    def load(self, s):
+        r = json.loads(s)
+        self.actions = r["actions"]
+        self.display_name = r["display_name"]
+        self.level = r["level"]
+        self.name = r["name"]
+        self.stats = r["stats"]
+        self.weapon = r["weapon"]
+        self.armor = r["armor"]

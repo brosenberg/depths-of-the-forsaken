@@ -45,6 +45,7 @@ class Combat(object):
                 s = "%s missed %s!" % (attacker.display_name, defender.display_name)
             return (hit, damage, s)
         else:
+            attacker.stats["ap_cur"] += attacker.actions["attack"]
             return (0, 0, "%s is too far away to hit %s!" % (attacker.display_name, defender.display_name))
 
     def do_action(self, attacker, defender, action):
@@ -61,8 +62,8 @@ class Combat(object):
             else:
                 return "%s can't move any closer." % (attacker.display_name,)
         if action == "run":
-            if self.distance < 30:
-                self.distance += 8
+            if self.distance < 20:
+                self.distance += 12
                 return "%s attempts to run away!" % (attacker.display_name,)
             else:
                 self.combat_complete = True
@@ -111,7 +112,10 @@ class Combat(object):
             self.player_turn = not self.player_turn
             turn += 1
 
+        self.player.lifespan += turn/2
+        if self.player.stats["hp_cur"] < 1:
+            print "%s has been slain." % (self.player.display_name,)
         if self.opponent.stats["hp_cur"] < 1:
             print "%s has been slain." % (self.opponent.display_name,)
-        else:
-            print "%s has been slain." % (self.player.display_name,)
+            self.player.kills += 1
+            self.player.experience += 50*self.opponent.level

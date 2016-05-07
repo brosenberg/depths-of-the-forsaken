@@ -18,8 +18,8 @@ def color_text(color, text):
         return text
 
 def oppose(attacker, defender, attack_stat, defend_stat):
-    attack = roll(100) + stat_modp(attacker.stats[attack_stat])
-    defend = roll(100) + stat_modp(defender.stats[defend_stat])
+    attack = roll(100) + stat_modp(attacker.stats[attack_stat]) + attacker.stats["luck"]
+    defend = roll(100) + stat_modp(defender.stats[defend_stat]) + defender.stats["luck"]
     if attack > defend:
         return True
     else:
