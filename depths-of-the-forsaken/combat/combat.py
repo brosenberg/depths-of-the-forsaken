@@ -29,17 +29,23 @@ class Combat(object):
         else:
             raise
 
+    # Returns (Hit, Damage, Crit)
     def _attack(self, attacker, defender):
-        if (self._to_hit(attacker, defender)):
+        (hit, crit) = self._to_hit(attacker, defender)
+        if hit:
             damage = self._damage(attacker, defender)
-            return (True, damage)
+            if crit:
+                damage += self._damage(attacker, defender)
+            return (True, damage, crit)
         else:
-            return (False, 0)
+            return (False, 0, False)
 
     def attack(self, attacker, defender):
         if self.can_reach(attacker, defender):
-            (hit, damage) = self._attack(attacker, defender)
-            if hit:
+            (hit, damage, crit) = self._attack(attacker, defender)
+            if crit:
+                s = "%s critically hit %s for %d damage!!!" % (attacker.display_name, defender.display_name, damage)
+            elif hit:
                 s = "%s hit %s for %d damage!" % (attacker.display_name, defender.display_name, damage)
             else:
                 s = "%s missed %s!" % (attacker.display_name, defender.display_name)
