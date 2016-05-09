@@ -61,7 +61,7 @@ class Combat(object):
         if action == "attack":
             (hit, damage, s) = self.attack(attacker, defender)
             return s
-        if action == "move":
+        if action == "approach":
             if self.distance > 1:
                 self.distance -= 1
                 return "%s moves closer." % (attacker.display_name,)
@@ -98,8 +98,9 @@ class Combat(object):
                 while self.player.stats["ap_cur"] > 0 and not self.combat_complete:
                     self.print_player_status()
                     prompt = "Which action will you perform?\n"
-                    for action in self.player.actions:
-                        prompt += "\t%8s %2d AP\n" % ("%s:"%(action,), self.player.actions[action])
+                    for action in sorted(self.player.actions):
+                        action_text = "%s:" % (utils.color_text('green', action),)
+                        prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action])
                     player_action = utils.get_expected_input(self.player.actions, prompt)
                     action_output = self.do_action(self.player, self.opponent, player_action)
                     print utils.color_text('yellow', action_output)
@@ -109,7 +110,7 @@ class Combat(object):
                 while self.opponent.stats["ap_cur"] > 0 and not self.combat_complete:
                     action_output = ""
                     if self.distance > 1:
-                        action_output = self.do_action(self.opponent, self.player, "move")
+                        action_output = self.do_action(self.opponent, self.player, "approach")
                     elif self.opponent.stats["ap_cur"] >= self.opponent.actions["attack"]:
                         action_output = self.do_action(self.opponent, self.player, "attack")
                     else:

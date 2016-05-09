@@ -27,10 +27,11 @@ class Actor(object):
         self.armor = None
 
         self.actions = {
+            "approach": 1,
             "attack": 8,
-            "move": 1,
             "run": 10,
-            "wait": 0
+            "wait": 0,
+            "withdraw": 1,
         }
 
     def __str__(self):

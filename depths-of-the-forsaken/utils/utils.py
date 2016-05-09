@@ -33,7 +33,7 @@ def get_yesno_input(prompt=None):
     if prompt:
         print prompt,
     else:
-        print "(y)es or (n)o?"
+        print "%s or %s?" % (color_text('green', 'yes'), color_text('green', 'no'))
     try:
         s = raw_input("> ")
     except EOFError:
