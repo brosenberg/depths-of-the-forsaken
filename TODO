@@ -1,0 +1,18 @@
+o When equipping items, check to see if the new item has a conflicting action with any other item. If it does, don't allow the new item to be equipped. OR: Keep track of each item's current active actions and ask the player which item's action they want to use. Then when unequipping an item only remove the actions that were active on that item. (Do the OR one. It's way better.)
+o Armor
+o Conditions (knocked down, poisoned, etc.)
+o Stat bonuses from items.
+o Level up.
+o Karma
+
+Actions to add:
+Precise strike
+Quick attack
+Power attack
+Stun attack
+Defensive stance
+Offensive stance
+Defend
+Dodge
+Consider
+Aimed attacks
