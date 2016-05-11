@@ -54,29 +54,43 @@ class Combat(object):
             attacker.stats["ap_cur"] += attacker.actions["attack"]
             return (0, 0, "%s is too far away to hit %s!" % (attacker.display_name, defender.display_name))
 
+    # Returns ("String describing the action", Whether the action could be completed)
     def do_action(self, attacker, defender, action):
+        if action == "wait":
+            if attacker.stats["fatigue_cur"] < attacker.stats["fatigue_max"]:
+                attacker.stats["fatigue_cur"] += attacker.stats["ap_cur"]
+                if attacker.stats["fatigue_cur"] > attacker.stats["fatigue_max"]:
+                    attacker.stats["fatigue_cur"] = attacker.stats["fatigue_max"]
+            attacker.stats["ap_cur"] = 0
+            return ("%s waits." % (attacker.display_name,), True)
+
         if attacker.stats["ap_cur"] < attacker.actions[action]:
-            return "Not enough AP."
+            return ("%s is out of actions." % (attacker.display_name,), False)
         attacker.stats["ap_cur"] -= attacker.actions[action]
+
+        if attacker.stats["fatigue_cur"] < 1:
+            return ("%s is too tired and should wait." % (attacker.display_name,), False)
+
         if action == "attack":
+            attacker.stats["fatigue_cur"] -= 1
             (hit, damage, s) = self.attack(attacker, defender)
-            return s
+            return (s, True)
+
         if action == "approach":
             if self.distance > 1:
                 self.distance -= 1
-                return "%s moves closer." % (attacker.display_name,)
+                return ("%s moves closer." % (attacker.display_name,), True)
             else:
-                return "%s can't move any closer." % (attacker.display_name,)
+                return ("%s can't move any closer." % (attacker.display_name,), False)
+
         if action == "run":
             if self.distance < 20:
                 self.distance += 12
-                return "%s attempts to run away!" % (attacker.display_name,)
+                return ("%s attempts to run away!" % (attacker.display_name,), True)
             else:
                 self.combat_complete = True
-                return "%s has run away!" % (attacker.display_name,)
-        if action == "wait":
-            attacker.stats["ap_cur"] = 0
-            return "%s waits." % (attacker.display_name,)
+                return ("%s has run away!" % (attacker.display_name,), True)
+
         raise Exception("Unknown action: %s" % (action,))
 
     def print_player_status(self):
@@ -102,19 +116,24 @@ class Combat(object):
                         action_text = "%s:" % (utils.color_text('green', action),)
                         prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action])
                     player_action = utils.get_expected_input(self.player.actions, prompt)
-                    action_output = self.do_action(self.player, self.opponent, player_action)
+                    (action_output, _) = self.do_action(self.player, self.opponent, player_action)
                     print utils.color_text('yellow', action_output)
                 self.player.stats["ap_cur"] = self.player.stats["ap_max"]
 
             else:
+                action_success = True
                 while self.opponent.stats["ap_cur"] > 0 and not self.combat_complete:
                     action_output = ""
+                    action = "wait"
+
                     if self.distance > 1:
-                        action_output = self.do_action(self.opponent, self.player, "approach")
+                        action = "approach"
                     elif self.opponent.stats["ap_cur"] >= self.opponent.actions["attack"]:
-                        action_output = self.do_action(self.opponent, self.player, "attack")
-                    else:
-                        action_output = self.do_action(self.opponent, self.player, "wait")
+                        action = "attack"
+
+                    if not action_success:
+                        action = "wait"
+                    (action_output, action_succes) = self.do_action(self.opponent, self.player, action)
                     print utils.color_text('red', action_output)
                 self.opponent.stats["ap_cur"] = self.opponent.stats["ap_max"]
 
@@ -123,8 +142,8 @@ class Combat(object):
 
         self.player.lifespan += turn/2
         if self.player.stats["hp_cur"] < 1:
-            print "%s has been slain." % (self.player.display_name,)
+            print utils.color_text("purple", "%s has been slain." % (self.player.display_name,))
         if self.opponent.stats["hp_cur"] < 1:
-            print "%s has been slain." % (self.opponent.display_name,)
+            print utils.color_text("purple", "%s has been slain." % (self.opponent.display_name,))
             self.player.kills += 1
             self.player.experience += 50*self.opponent.level

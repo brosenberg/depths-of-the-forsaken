@@ -90,7 +90,8 @@ class Actor(object):
         self.stats["ap_cur"] = self.stats["ap_max"]
         self.stats["hp_cur"] = self.stats["hp_max"]
         self.stats["sp_cur"] = self.stats["sp_max"]
-        self.stats["fatigue_cur"] = self.stats["fatigue_max"]
+        #self.stats["fatigue_cur"] = self.stats["fatigue_max"]
+        self.stats["fatigue_cur"] = 1
 
     def get_state(self):
         s = "%s: HP %d/%d  Fatigue %d/%d  AP %d/%d  SP %d/%d" % (self.name,
