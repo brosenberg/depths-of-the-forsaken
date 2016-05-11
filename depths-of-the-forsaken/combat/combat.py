@@ -21,7 +21,7 @@ class Combat(object):
         return damage
 
     def can_reach(self, attacker, defender):
-        if attacker.weapon is None:
+        if attacker.equipment["main hand"] is None:
             if self.distance < 3:
                 return True
             else:

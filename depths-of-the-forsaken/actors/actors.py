@@ -31,16 +31,29 @@ class Actor(object):
 
         self._calculate_secondary_stats()
 
-        self.weapon = None
-        self.armor = None
+        self.equipment = {
+            "arms": None,
+            "feet": None,
+            "hands": None,
+            "head": None,
+            "legs": None,
+            "main hand": None,
+            "off hand": None,
+            "torso": None,
+            "wrists": None
+        }
 
-        self.actions = {
-            "approach": 1,
+        self.inventory = []
+
+        self.base_actions = {
             "attack": 8,
+            "approach": 1,
             "run": 10,
             "wait": 0,
             "withdraw": 1,
         }
+
+        self.actions = self.base_actions
 
     def __str__(self):
         s = "%s (level %d)\n" % (self.name, self.level)
@@ -61,11 +74,11 @@ class Actor(object):
         r = {}
         r["actions"] = self.actions
         r["display_name"] = self.display_name
+        r["equipment"] = self.equipment
+        r["inventory"] = self.inventory
         r["level"] = self.level
         r["name"] = self.name
         r["stats"] = self.stats
-        r["weapon"] = self.weapon
-        r["armor"] = self.armor
         return r
 
     def _calculate_secondary_stats(self):
@@ -101,10 +114,11 @@ class Actor(object):
 
     def load(self, s):
         r = json.loads(s)
-        self.actions = r["actions"]
-        self.display_name = r["display_name"]
-        self.level = r["level"]
-        self.name = r["name"]
-        self.stats = r["stats"]
-        self.weapon = r["weapon"]
-        self.armor = r["armor"]
+        # TODO: This should set working defaults.
+        self.actions = r.get("actions", {})
+        self.display_name = r.get("display_name", "DEFAULT NAME")
+        self.equipment = r.get("equipment", {})
+        self.inventory = r.get("inventory", [])
+        self.level = r.get("level", 1)
+        self.name = r.get("name", "DEFAULT NAME")
+        self.stats = r.get("stats", {})

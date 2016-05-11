@@ -41,7 +41,7 @@ def chargen():
             for stat in actors.BASE_STATS:
                 prompt += "%s: %s  " % (stat.title(), stats[stat])
             prompt += "\nWhich stat would you like to assign the %d to?\n" % (value,)
-            chosen_stat = utils.get_expected_input(actors.BASE_STATS, prompt)
+            chosen_stat = utils.get_expected_input(actors.BASE_STATS, prompt).lower()
             if stats[chosen_stat] != "":
                 print "That stat has already been assigned."
             else:
