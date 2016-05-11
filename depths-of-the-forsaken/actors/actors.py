@@ -1,6 +1,14 @@
 import json
 
-BASE_STATS = ["str", "dex", "con", "wis", "int", "cha", "luck"]
+BASE_STATS = [
+    "toughness",
+    "agility",
+    "perception",
+    "intelligence",
+    "willpower",
+    "charisma",
+    "luck"
+]
 
 class Actor(object):
     def __init__(self, name, display_name=None, stats=None):
@@ -61,10 +69,10 @@ class Actor(object):
         return r
 
     def _calculate_secondary_stats(self):
-        self.stats["ap_max"] = 2*self.stats["dex"]
-        self.stats["hp_max"] = self.stats["con"]
-        self.stats["sp_max"] = 2*self.stats["int"]
-        self.stats["fatigue_max"] = 2*self.stats["con"]
+        self.stats["ap_max"] = 2*self.stats["agility"]
+        self.stats["hp_max"] = self.stats["toughness"]
+        self.stats["sp_max"] = 2*self.stats["intelligence"]
+        self.stats["fatigue_max"] = 2*self.stats["toughness"]
 
         self.stats["ap_cur"] = self.stats["ap_max"]
         self.stats["hp_cur"] = self.stats["hp_max"]

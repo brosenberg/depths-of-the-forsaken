@@ -44,10 +44,11 @@ def get_yesno_input(prompt=None):
         return False
 
 # Returns (Hit, Crit)
-def oppose(attacker, defender, attack_stat, defend_stat, attack_mod=0, defend_mod=0):
-    attack = roll(100) + stat_modp(attacker.stats[attack_stat]) + attacker.stats["luck"] + attack_mod
+def oppose(attacker, defender, attack_stat, defend_stat, attack_mod=0, defend_mod=0, crit_mod=0):
+    attack_raw = roll(100)
+    attack = attack_raw + stat_modp(attacker.stats[attack_stat]) + attacker.stats["luck"] + attack_mod
     defend = roll(100) + stat_modp(defender.stats[defend_stat]) + defender.stats["luck"] + defend_mod
-    crit = True if attack >= 95 else False
+    crit = True if attack_raw - crit_mod >= 95 else False
     if attack >= defend:
         return (True, crit)
     else:

@@ -11,10 +11,10 @@ class Combat(object):
         self.combat_complete = False
 
     def _to_hit(self, attacker, defender):
-        return utils.oppose(attacker, defender, "dex", "dex")
+        return utils.oppose(attacker, defender, "agility", "agility")
 
     def _damage(self, attacker, defender):
-        damage = utils.roll(6) + utils.stat_mod(attacker.stats["str"])
+        damage = utils.roll(6) + utils.stat_mod(attacker.stats["toughness"])
         defender.stats["hp_cur"] -= damage
         if defender.stats["hp_cur"] < 1:
             self.combat_complete = True
