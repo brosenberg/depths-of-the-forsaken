@@ -20,14 +20,11 @@ class Combat(object):
             self.combat_complete = True
         return damage
 
-    def can_reach(self, attacker, defender):
-        if attacker.equipment["main hand"] is None:
-            if self.distance < 3:
-                return True
-            else:
-                return False
+    def can_reach(self, attacker):
+        if attacker.actions["attack"]["reach"] >= self.distance:
+            return True
         else:
-            raise
+            return False
 
     # Returns (Hit, Damage, Crit)
     def _attack(self, attacker, defender, damage_array):
@@ -41,7 +38,7 @@ class Combat(object):
             return (False, 0, False)
 
     def attack(self, attacker, defender, damage_array):
-        if self.can_reach(attacker, defender):
+        if self.can_reach(attacker):
             (hit, damage, crit) = self._attack(attacker, defender, damage_array)
             if crit:
                 s = "%s critically hit %s for %d damage!!!" % (attacker.display_name, defender.display_name, damage)
@@ -51,7 +48,7 @@ class Combat(object):
                 s = "%s missed %s!" % (attacker.display_name, defender.display_name)
             return (hit, damage, s)
         else:
-            attacker.stats["ap_cur"] += attacker.actions["attack"]
+            attacker.stats["ap_cur"] += attacker.actions["attack"]["ap"]
             return (0, 0, "%s is too far away to hit %s!" % (attacker.display_name, defender.display_name))
 
     # Returns ("String describing the action", Whether the action could be completed)
@@ -118,10 +115,15 @@ class Combat(object):
                     prompt = "Which action will you perform?\n"
                     for action in sorted(self.player.actions):
                         action_text = "%s:" % (utils.color_text('green', action),)
-                        desc = self.player.actions[action]["desc"]
+                        desc = self.player.base_actions[action]["desc"]
                         if action == "attack":
                             damage = self.player.actions[action]["damage"]
-                            desc = desc % (self.player.actions[action]["reach"], damage[0]+damage[2], damage[1]+damage[2])
+                            weapon_name = "bare fists"
+                            if self.player.equipment.get("main hand"):
+                                weapon_name = self.player.equipment["main hand"]["name"]
+                            min_dmg = damage[0]+damage[2]
+                            max_dmg = (damage[0]*damage[1])+damage[2]
+                            desc = desc % (weapon_name, min_dmg, max_dmg, self.player.actions[action]["reach"])
                         prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action]["ap"])
                         prompt += "\t  %s\n" % (desc,)
                     player_action = utils.get_expected_input(self.player.actions, prompt)

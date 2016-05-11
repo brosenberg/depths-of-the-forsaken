@@ -5,6 +5,7 @@ from actors import player
 from combat import combat
 from utils import utils
 
+# TODO: Move save and load to utils.
 def _load_game(pc):
     print "Specify the path to the save file:"
     save_file = raw_input("> ")
@@ -46,6 +47,7 @@ def save_game(pc):
             return
 
 def main():
+    items = utils.load_items()
     pc = player.Player("Bob")
     print "You have been banished to the Depths of the Forsaken!"
     prompt = "Would you like to %s a new character or %s an old one?\n" % (utils.color_text("green", "create"), utils.color_text("green", "load"))
@@ -57,6 +59,9 @@ def main():
     else:
         pc = player.chargen()
         save_game(pc)
+    #pc.equip(items["stone knife"], "main hand")
+    pc.equip(items["Father of Swords"], "main hand")
+    #pc.unequip("main hand")
     monster = actors.Actor("Orc")
     fight = combat.Combat(pc, monster)
     fight.main_loop()

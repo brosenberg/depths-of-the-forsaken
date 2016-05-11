@@ -49,7 +49,7 @@ class Actor(object):
             "attack": {
                 "ap": 8,
                 "damage": [1, 3, 0],
-                "desc": "Attack a target with a range of %d for %d-%d damage",
+                "desc": "Attack your oppnent with %s (%d-%d damage  %d range)",
                 "reach": 1
             },
             "approach": {
@@ -101,6 +101,22 @@ class Actor(object):
         self.stats["hp_cur"] = self.stats["hp_max"]
         self.stats["sp_cur"] = self.stats["sp_max"]
         self.stats["fatigue_cur"] = self.stats["fatigue_max"]
+
+    def equip(self, item, slot):
+        if self.equipment[slot] is not None:
+            for action in self.equipment[slot]["actions"]:
+                self.actions[action] = self.base_actions[action]
+            self.inventory.append(self.equipment[slot])
+        self.equipment[slot] = item
+        for action in item["actions"]:
+            self.actions[action] = item["actions"][action]
+
+    def unequip(self, slot):
+        if self.equipment[slot] is not None:
+            for action in self.equipment[slot]["actions"]:
+                self.actions[action] = self.base_actions[action]
+            self.inventory.append(self.equipment[slot])
+        self.equipment[slot] = None
 
     def get_state(self):
         return str(self)

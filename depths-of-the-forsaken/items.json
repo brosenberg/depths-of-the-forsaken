@@ -1,11 +1,23 @@
 {
     "stone knife": {
+        "name": "stone knife",
         "type": "weapon",
         "actions": {
             "attack": {
                 "damage": [1, 4, 0],
                 "reach": 2,
                 "ap": 10
+            }
+        }
+    },
+    "Father of Swords": {
+        "name": "Father of Swords",
+        "type": "weapon",
+        "actions": {
+            "attack": {
+                "damage": [3, 8, 8],
+                "reach": 4,
+                "ap": 14
             }
         }
     }

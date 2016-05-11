@@ -1,3 +1,4 @@
+import json
 import random
 
 COLORS = {
@@ -42,6 +43,9 @@ def get_yesno_input(prompt=None):
         return True
     else:
         return False
+
+def load_items(items_file="items.json"):
+    return json.loads(open(items_file).read())
 
 # Returns (Hit, Crit)
 def oppose(attacker, defender, attack_stat, defend_stat, attack_mod=0, defend_mod=0, crit_mod=0):
