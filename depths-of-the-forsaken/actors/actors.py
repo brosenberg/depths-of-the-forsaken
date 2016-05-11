@@ -46,25 +46,30 @@ class Actor(object):
         self.inventory = []
 
         self.base_actions = {
-            "attack": 8,
-            "approach": 1,
-            "run": 10,
-            "wait": 0,
-            "withdraw": 1,
+            "attack": {
+                "ap": 8,
+                "damage": [1, 3, 0],
+                "reach": 1
+            },
+            "approach": {
+                "ap": 1,
+            },
+            "run": {
+                "ap": 10
+            },
+            "wait": {
+                "ap": 0
+            },
+            "withdraw": {
+                "ap": 1,
+            },
         }
 
         self.actions = self.base_actions
 
     def __str__(self):
-        s = "%s (level %d)\n" % (self.name, self.level)
-        for stat in BASE_STATS:
-            s += "%s %d  " % (stat, self.stats[stat])
-        s += "\n"
-        s += "Action Points: %d/%d\n" % (self.stats["ap_cur"], self.stats["ap_max"])
-        s += "Hit Points:    %d/%d\n" % (self.stats["hp_cur"], self.stats["hp_max"])
-        s += "Fatigue:       %d/%d\n" % (self.stats["fatigue_cur"], self.stats["fatigue_max"])
-        s += "Spell Points:  %d/%d\n" % (self.stats["sp_cur"], self.stats["sp_max"])
-        s += "\nWeapon: %s\nArmor: %s\n" % (self.weapon, self.armor)
+        s = "%s: HP %d/%d  Fatigue %d/%d  AP %d/%d  SP %d/%d" % (self.name,
+            self.stats["hp_cur"], self.stats["hp_max"], self.stats["fatigue_cur"], self.stats["fatigue_max"], self.stats["ap_cur"], self.stats["ap_max"], self.stats["sp_cur"], self.stats["sp_max"])
         return s
 
     def __repr__(self):
@@ -90,13 +95,10 @@ class Actor(object):
         self.stats["ap_cur"] = self.stats["ap_max"]
         self.stats["hp_cur"] = self.stats["hp_max"]
         self.stats["sp_cur"] = self.stats["sp_max"]
-        #self.stats["fatigue_cur"] = self.stats["fatigue_max"]
-        self.stats["fatigue_cur"] = 1
+        self.stats["fatigue_cur"] = self.stats["fatigue_max"]
 
     def get_state(self):
-        s = "%s: HP %d/%d  Fatigue %d/%d  AP %d/%d  SP %d/%d" % (self.name,
-            self.stats["hp_cur"], self.stats["hp_max"], self.stats["fatigue_cur"], self.stats["fatigue_max"], self.stats["ap_cur"], self.stats["ap_max"], self.stats["sp_cur"], self.stats["sp_max"])
-        return s
+        return str(self)
 
     def get_fuzzy_state(self):
         s = "%s appears to be " % (self.display_name,)

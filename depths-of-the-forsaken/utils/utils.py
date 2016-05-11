@@ -54,8 +54,13 @@ def oppose(attacker, defender, attack_stat, defend_stat, attack_mod=0, defend_mo
     else:
         return (False, False)
 
-def roll(sides):
-    return random.randint(1, sides)
+def roll(*args):
+    if len(args) == 0:
+        return random.randint(1, 100)
+    elif len(args) == 1:
+        return random.randint(1, args[0])
+    else:
+        return random.randint(args[0], args[1])
 
 def stat_mod(stat):
     return (stat-10)/2;

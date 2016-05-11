@@ -3,7 +3,7 @@
         "type": "weapon",
         "actions": {
             "attack": {
-                "damage": [1, 4],
+                "damage": [1, 4, 0],
                 "reach": 2,
                 "ap": 10
             }
