@@ -49,19 +49,24 @@ class Actor(object):
             "attack": {
                 "ap": 8,
                 "damage": [1, 3, 0],
+                "desc": "Attack a target with a range of %d for %d-%d damage",
                 "reach": 1
             },
             "approach": {
                 "ap": 1,
+                "desc": "Move one foot closer to your opponent"
             },
             "run": {
-                "ap": 10
+                "ap": 10,
+                "desc": "Run twelve feet away from your opponent and attempt to flee"
             },
             "wait": {
-                "ap": 0
+                "ap": 0,
+                "desc": "Recover fatigue equal to your remaining AP and end your turn"
             },
             "withdraw": {
                 "ap": 1,
+                "desc": "Move one foot away from your opponent"
             },
         }
 

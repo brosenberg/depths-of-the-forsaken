@@ -105,6 +105,7 @@ class Combat(object):
             print "You are %d feet from the %s." % (self.distance, self.opponent.display_name)
 
     def main_loop(self):
+        # TODO: Break this up into more functions. This thing is stupid big.
         turn = 2
         while not self.combat_complete:
 
@@ -117,7 +118,12 @@ class Combat(object):
                     prompt = "Which action will you perform?\n"
                     for action in sorted(self.player.actions):
                         action_text = "%s:" % (utils.color_text('green', action),)
+                        desc = self.player.actions[action]["desc"]
+                        if action == "attack":
+                            damage = self.player.actions[action]["damage"]
+                            desc = desc % (self.player.actions[action]["reach"], damage[0]+damage[2], damage[1]+damage[2])
                         prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action]["ap"])
+                        prompt += "\t  %s\n" % (desc,)
                     player_action = utils.get_expected_input(self.player.actions, prompt)
                     (action_output, _) = self.do_action(self.player, self.opponent,  player_action, self.player.actions[player_action])
                     print utils.color_text('yellow', action_output)
