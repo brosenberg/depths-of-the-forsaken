@@ -3,7 +3,6 @@
 from actors import actors
 from actors import player
 from combat import combat
-from items import items
 from utils import utils
 
 def _load_game(pc):
