@@ -75,8 +75,10 @@ class Actor(object):
         self.actions = self.base_actions
 
     def __str__(self):
-        s = "%s: HP %d/%d  Fatigue %d/%d  AP %d/%d  SP %d/%d" % (self.name,
-            self.stats["hp_cur"], self.stats["hp_max"], self.stats["fatigue_cur"], self.stats["fatigue_max"], self.stats["ap_cur"], self.stats["ap_max"], self.stats["sp_cur"], self.stats["sp_max"])
+        s = ""
+        for stat in ["HP", "Fatigue", "AP", "SP"]:
+            lstat = stat.lower()
+            s += "%s %d/%d  " % (stat, self.stats[lstat+"_cur"], self.stats[lstat+"_max"])
         return s
 
     def __repr__(self):

@@ -24,6 +24,28 @@ class Player(actors.Actor):
         self.kills = r["kills"]
         self.lifespan = r["lifespan"]
 
+    def character_record(self):
+        s = "%s  Level %d\n\n" % (utils.color_text("purple", self.name), self.level)
+        s += utils.color_text("cyan", "- Statistics -\n")
+        for stat in actors.BASE_STATS:
+            s += "%22s %s\n" % (utils.color_text("yellow", stat.title())+":", self.stats[stat])
+        s += "\n"
+        for stat in ["HP", "Fatigue", "AP", "SP"]:
+            lstat = stat.lower()
+            s += "%s %d/%d  " % (stat, self.stats[lstat+"_cur"], self.stats[lstat+"_max"])
+        s += "\n\n"
+        s += utils.color_text("cyan", "- Equipped items -\n")
+        for slot in self.equipment:
+            if self.equipment[slot] is None:
+                name = ""
+            else:
+                name = self.equipment[slot]["name"]
+            s += "%11s %s\n" % (slot.title()+":", name)
+        s += utils.color_text("cyan", "- Inventory -\n")
+        for item in self.inventory:
+            s += "%s\n" % (item["name"],)
+        return s
+
 
 def chargen():
     name = raw_input("What is your name? > ")

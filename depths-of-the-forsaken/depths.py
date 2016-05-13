@@ -63,6 +63,8 @@ def main():
     #pc.equip(items["Father of Swords"], "main hand")
     #pc.unequip("main hand")
     monster = actors.Actor("Orc")
+    print pc.character_record()
+    return
     fight = combat.Combat(pc, monster)
     fight.main_loop()
     if pc.stats["hp_cur"] < 1:
