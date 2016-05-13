@@ -50,6 +50,8 @@ class Actor(object):
                 "ap": 8,
                 "damage": [1, 3, 0],
                 "desc": "Attack your oppnent with %s (%d-%d damage  %d range)",
+                "hit_desc": ["punches", "jabs", "kicks"],
+                "crit_desc": ["pummels", "mauls"],
                 "reach": 1
             },
             "approach": {

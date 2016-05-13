@@ -59,8 +59,8 @@ def main():
     else:
         pc = player.chargen()
         save_game(pc)
-    #pc.equip(items["stone knife"], "main hand")
-    pc.equip(items["Father of Swords"], "main hand")
+    pc.equip(items["stone knife"], "main hand")
+    #pc.equip(items["Father of Swords"], "main hand")
     #pc.unequip("main hand")
     monster = actors.Actor("Orc")
     fight = combat.Combat(pc, monster)

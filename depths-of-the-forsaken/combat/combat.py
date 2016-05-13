@@ -1,3 +1,5 @@
+import random
+
 from actors import actors
 from utils import utils
 
@@ -37,13 +39,15 @@ class Combat(object):
         else:
             return (False, 0, False)
 
-    def attack(self, attacker, defender, damage_array):
+    def attack(self, attacker, defender, action):
         if self.can_reach(attacker):
-            (hit, damage, crit) = self._attack(attacker, defender, damage_array)
+            (hit, damage, crit) = self._attack(attacker, defender, action["damage"])
             if crit:
-                s = "%s critically hit %s for %d damage!!!" % (attacker.display_name, defender.display_name, damage)
+                desc = random.choice(action["crit_desc"])
+                s = "%s critically %s %s for %d damage!!!" % (attacker.display_name, desc, defender.display_name, damage)
             elif hit:
-                s = "%s hit %s for %d damage!" % (attacker.display_name, defender.display_name, damage)
+                desc = random.choice(action["hit_desc"])
+                s = "%s %s %s for %d damage!" % (attacker.display_name, desc, defender.display_name, damage)
             else:
                 s = "%s missed %s!" % (attacker.display_name, defender.display_name)
             return (hit, damage, s)
@@ -70,7 +74,7 @@ class Combat(object):
 
         if action_type == "attack":
             attacker.stats["fatigue_cur"] -= 1
-            (hit, damage, s) = self.attack(attacker, defender, action["damage"])
+            (hit, damage, s) = self.attack(attacker, defender, action)
             return (s, True)
 
         if action_type == "approach":
