@@ -29,6 +29,23 @@ def chargen():
     name = raw_input("What is your name? > ")
     stats = {}
     values = [16, 14, 12, 11, 10, 10, 8]
+    print "You will now assign values to your stats"
+    print
+    print utils.color_text("yellow", "Toughness")
+    print "Determines your hit points, fatigue, and modifies your melee damage."
+    print utils.color_text("yellow", "Agility")
+    print "Determines your initiative in combat, your chance to hit enemies, and your chance to dodge."
+    print utils.color_text("yellow", "Perception")
+    print "Determines nothing right now!"
+    print utils.color_text("yellow", "Intelligence")
+    print "Determines nothing right now!"
+    print utils.color_text("yellow", "Willpower")
+    print "Determines nothing right now!"
+    print utils.color_text("yellow", "Charisma")
+    print "Determines nothing right now!"
+    print utils.color_text("yellow", "Luck")
+    print "Slightly effects every action you perform."
+    print
     print "You have the following stat values to assign:"
     print " ".join([str(x) for x in values])
     for stat in actors.BASE_STATS:
@@ -39,7 +56,7 @@ def chargen():
         while choosing:
             prompt = ""
             for stat in actors.BASE_STATS:
-                prompt += "%s: %s  " % (stat.title(), stats[stat])
+                prompt += "%s: %2s  " % (stat.title(), stats[stat])
             prompt += "\nWhich stat would you like to assign the %d to?\n" % (value,)
             chosen_stat = utils.get_expected_input(actors.BASE_STATS, prompt).lower()
             if stats[chosen_stat] != "":
