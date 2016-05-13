@@ -80,6 +80,10 @@ class Combat(object):
             else:
                 return ("%s can't move any closer." % (attacker.display_name,), False)
 
+        if action_type == "withdraw":
+            self.distance += 1
+            return ("%s withdraws a foot." % (attacker.display_name,), True)
+
         if action_type == "run":
             if self.distance < 20:
                 self.distance += 12
