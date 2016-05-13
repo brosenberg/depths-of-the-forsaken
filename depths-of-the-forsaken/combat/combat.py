@@ -9,7 +9,11 @@ class Combat(object):
         self.player = player
         self.opponent = opponent
         self.distance = distance
-        self.player_turn = True if self._to_hit(self.player, self.opponent) else False
+        self.turn = 1
+        if self._to_hit(self.player, self.opponent):
+            self.initiative = [self.player, self.opponent]
+        else:
+            self.initiative = [self.opponent, self.player]
         self.combat_complete = False
 
     def _to_hit(self, attacker, defender):
@@ -109,60 +113,62 @@ class Combat(object):
         else:
             print "You are %d feet from the %s." % (self.distance, self.opponent.display_name)
 
+    def player_turn(self):
+        while self.player.stats["ap_cur"] > 0 and not self.combat_complete:
+            self.print_player_status()
+            prompt = "Which action will you perform?\n"
+            for action in sorted(self.player.actions):
+                action_text = "%s:" % (utils.color_text('green', action),)
+                desc = self.player.base_actions[action]["desc"]
+                if action == "attack":
+                    damage = self.player.actions[action]["damage"]
+                    weapon_name = "bare fists"
+                    if self.player.equipment.get("main hand"):
+                        weapon_name = self.player.equipment["main hand"]["name"]
+                    min_dmg = damage[0]+damage[2]
+                    max_dmg = (damage[0]*damage[1])+damage[2]
+                    desc = desc % (weapon_name, min_dmg, max_dmg, self.player.actions[action]["reach"])
+                prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action]["ap"])
+                prompt += "\t  %s\n" % (desc,)
+            player_action = utils.get_expected_input(self.player.actions, prompt)
+            (action_output, _) = self.do_action(self.player, self.opponent,  player_action, self.player.actions[player_action])
+            print utils.color_text('yellow', action_output)
+        self.player.stats["ap_cur"] = self.player.stats["ap_max"]
+
+    def opponent_turn(self):
+        action_success = True
+        while self.opponent.stats["ap_cur"] > 0 and not self.combat_complete:
+            action_output = ""
+            action = "wait"
+
+            if self.distance > 1:
+                action = "approach"
+            elif self.opponent.stats["ap_cur"] >= self.opponent.actions["attack"]["ap"]:
+                action = "attack"
+
+            if not action_success:
+                action = "wait"
+            (action_output, action_succes) = self.do_action(self.opponent, self.player, action, self.opponent.actions[action])
+            print utils.color_text('red', action_output)
+        self.opponent.stats["ap_cur"] = self.opponent.stats["ap_max"]
+
     def main_loop(self):
-        # TODO: Break this up into more functions. This thing is stupid big.
-        turn = 2
+        print "%s goes first!" % (self.initiative[0].display_name,)
         while not self.combat_complete:
+            print utils.color_text('cyan', "Turn %d  %s" % (self.turn, "-"*20))
 
-            if turn%2 == 0:
-                print utils.color_text('cyan', "Turn %d  %s" % (turn/2, "-"*20))
+            for combatant in self.initiative:
+                if combatant is self.player:
+                    self.player_turn()
+                elif combatant is self.opponent:
+                    self.opponent_turn()
 
-            if self.player_turn:
-                while self.player.stats["ap_cur"] > 0 and not self.combat_complete:
-                    self.print_player_status()
-                    prompt = "Which action will you perform?\n"
-                    for action in sorted(self.player.actions):
-                        action_text = "%s:" % (utils.color_text('green', action),)
-                        desc = self.player.base_actions[action]["desc"]
-                        if action == "attack":
-                            damage = self.player.actions[action]["damage"]
-                            weapon_name = "bare fists"
-                            if self.player.equipment.get("main hand"):
-                                weapon_name = self.player.equipment["main hand"]["name"]
-                            min_dmg = damage[0]+damage[2]
-                            max_dmg = (damage[0]*damage[1])+damage[2]
-                            desc = desc % (weapon_name, min_dmg, max_dmg, self.player.actions[action]["reach"])
-                        prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action]["ap"])
-                        prompt += "\t  %s\n" % (desc,)
-                    player_action = utils.get_expected_input(self.player.actions, prompt)
-                    (action_output, _) = self.do_action(self.player, self.opponent,  player_action, self.player.actions[player_action])
-                    print utils.color_text('yellow', action_output)
-                self.player.stats["ap_cur"] = self.player.stats["ap_max"]
+            self.turn += 1
 
-            else:
-                action_success = True
-                while self.opponent.stats["ap_cur"] > 0 and not self.combat_complete:
-                    action_output = ""
-                    action = "wait"
-
-                    if self.distance > 1:
-                        action = "approach"
-                    elif self.opponent.stats["ap_cur"] >= self.opponent.actions["attack"]["ap"]:
-                        action = "attack"
-
-                    if not action_success:
-                        action = "wait"
-                    (action_output, action_succes) = self.do_action(self.opponent, self.player, action, self.opponent.actions[action])
-                    print utils.color_text('red', action_output)
-                self.opponent.stats["ap_cur"] = self.opponent.stats["ap_max"]
-
-            self.player_turn = not self.player_turn
-            turn += 1
-
-        self.player.lifespan += turn/2
         if self.player.stats["hp_cur"] < 1:
             print utils.color_text("purple", "%s has been slain." % (self.player.display_name,))
         if self.opponent.stats["hp_cur"] < 1:
             print utils.color_text("purple", "%s has been slain." % (self.opponent.display_name,))
+            self.player.lifespan += self.turn
             self.player.kills += 1
             self.player.experience += 50*self.opponent.level

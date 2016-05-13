@@ -93,6 +93,17 @@ class Actor(object):
         r["stats"] = self.stats
         return r
 
+    def load(self, s):
+        r = json.loads(s)
+        # TODO: This should set working defaults.
+        self.actions = r.get("actions", {})
+        self.display_name = r.get("display_name", "DEFAULT NAME")
+        self.equipment = r.get("equipment", {})
+        self.inventory = r.get("inventory", [])
+        self.level = r.get("level", 1)
+        self.name = r.get("name", "DEFAULT NAME")
+        self.stats = r.get("stats", {})
+
     def _calculate_secondary_stats(self):
         self.stats["ap_max"] = 2*self.stats["agility"]
         self.stats["hp_max"] = self.stats["toughness"]
@@ -137,14 +148,3 @@ class Actor(object):
             s += "near death"
         s += "."
         return s
-
-    def load(self, s):
-        r = json.loads(s)
-        # TODO: This should set working defaults.
-        self.actions = r.get("actions", {})
-        self.display_name = r.get("display_name", "DEFAULT NAME")
-        self.equipment = r.get("equipment", {})
-        self.inventory = r.get("inventory", [])
-        self.level = r.get("level", 1)
-        self.name = r.get("name", "DEFAULT NAME")
-        self.stats = r.get("stats", {})
