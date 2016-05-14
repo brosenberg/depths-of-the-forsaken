@@ -129,7 +129,7 @@ class Combat(object):
                     max_dmg = (damage[0]*damage[1])+damage[2]
                     desc = desc % (weapon_name, min_dmg, max_dmg, self.player.actions[action]["reach"])
                 prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action]["ap"])
-                prompt += "\t  %s\n" % (desc,)
+                prompt += "\t  %s\n" % (utils.color_text("grey", desc),)
             player_action = utils.get_expected_input(self.player.actions, prompt)
             (action_output, _) = self.do_action(self.player, self.opponent,  player_action, self.player.actions[player_action])
             print utils.color_text('yellow', action_output)

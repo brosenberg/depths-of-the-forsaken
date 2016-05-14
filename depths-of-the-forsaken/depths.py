@@ -60,6 +60,8 @@ def main():
     else:
         pc = player.chargen()
         save_game(pc)
+
+    pc.equip(items_db["Father of Swords"], "main hand")
     while True:
         print "What would you like to do?"
         prompt =  "%s character sheet.\n" % (utils.color_text("green", "Show"),)

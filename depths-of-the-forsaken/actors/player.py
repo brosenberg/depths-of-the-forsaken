@@ -1,6 +1,7 @@
 import actors
 import json
 
+from items import items
 from utils import utils
 
 class Player(actors.Actor):
@@ -40,16 +41,13 @@ class Player(actors.Actor):
         s += "Time in the Depths: %d\n" % (self.lifespan,)
 
         s += utils.color_text("cyan", "\n- Equipped items -\n")
-        for slot in self.equipment:
-            if self.equipment[slot] is None:
-                name = ""
-            else:
-                name = self.equipment[slot]["name"]
-            s += "%11s %s\n" % (slot.title()+":", name)
+        for slot in sorted(self.equipment):
+            item = items.str_item(self.equipment[slot])
+            s += "%11s %s\n" % (slot.title()+":", item)
 
         s += utils.color_text("cyan", "\n- Inventory -\n")
-        for item in self.inventory:
-            s += "%s\n" % (item["name"],)
+        for item in sorted(self.inventory):
+            s += "%s\n" % (items.str_item(item),)
         return s
 
 
