@@ -65,8 +65,9 @@ def main():
         prompt =  "%s character sheet.\n" % (utils.color_text("green", "Show"),)
         prompt += "%s or %s the game.\n" % (utils.color_text("green", "Save"), utils.color_text("green", "load"))
         prompt += "%s an enemy.\n" % (utils.color_text("green", "Fight"),)
+        prompt += "%s for a short while.\n" % (utils.color_text("green", "Rest"),)
         prompt += "%s the game.\n" % (utils.color_text("green", "Quit"),)
-        s = utils.get_expected_input(["show", "save", "load", "fight", "quit"], prompt).lower()
+        s = utils.get_expected_input(["show", "save", "load", "fight", "rest", "quit"], prompt).lower()
         if s == "show":
             print pc.character_record()
         elif s == "save":
@@ -74,9 +75,7 @@ def main():
         elif s == "load":
             _load_game(pc)
         elif s == "fight":
-            ## FIXME
-            # monster = actors.load_actor(actors_db["decaying skeleton"])
-            monster = actors.Actor("Decaying Skeleton")
+            monster = actors.load_actor(actors_db["decaying skeleton"])
             fight = combat.Combat(pc, monster)
             fight.main_loop()
             if pc.stats["hp_cur"] < 1:
@@ -86,6 +85,12 @@ def main():
                     load_game(pc)
                 else:
                     break
+        elif s == "rest":
+            pc.stats["ap_cur"] = pc.stats["ap_max"]
+            pc.stats["hp_cur"] = pc.stats["hp_max"]
+            pc.stats["sp_cur"] = pc.stats["sp_max"]
+            pc.stats["fatigue_cur"] = pc.stats["fatigue_max"]
+            pc.lifespan += 100
         elif s == "quit":
             break
     print "Good bye!"

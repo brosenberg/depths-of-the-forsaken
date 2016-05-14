@@ -102,7 +102,10 @@ class Actor(object):
         return r
 
     def load(self, s):
-        r = json.loads(s)
+        if type(s) == str:
+            r = json.loads(s)
+        elif type(s) == dict:
+            r = s
         self.base_actions = r.get("base_actions", self.actions)
         self.actions = r.get("actions", self.actions)
         self.display_name = r.get("display_name", self.display_name)

@@ -19,7 +19,10 @@ class Player(actors.Actor):
 
     def load(self, s):
         super(self.__class__, self).load(s)
-        r = json.loads(s)
+        if type(s) == str:
+            r = json.loads(s)
+        elif type(s) == dict:
+            r = s
         self.experience = r.get("experience", self.experience)
         self.kills = r.get("kills", self.kills)
         self.lifespan = r.get("lifespan", self.lifespan)
@@ -33,15 +36,18 @@ class Player(actors.Actor):
         for stat in ["HP", "Fatigue", "AP", "SP"]:
             lstat = stat.lower()
             s += "%s %d/%d  " % (stat, self.stats[lstat+"_cur"], self.stats[lstat+"_max"])
-        s += "\n\n"
-        s += utils.color_text("cyan", "- Equipped items -\n")
+        s += "\n"
+        s += "Time in the Depths: %d\n" % (self.lifespan,)
+
+        s += utils.color_text("cyan", "\n- Equipped items -\n")
         for slot in self.equipment:
             if self.equipment[slot] is None:
                 name = ""
             else:
                 name = self.equipment[slot]["name"]
             s += "%11s %s\n" % (slot.title()+":", name)
-        s += utils.color_text("cyan", "- Inventory -\n")
+
+        s += utils.color_text("cyan", "\n- Inventory -\n")
         for item in self.inventory:
             s += "%s\n" % (item["name"],)
         return s
