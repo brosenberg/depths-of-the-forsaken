@@ -68,7 +68,7 @@ def roll(*args):
         return random.randint(args[0], args[1])
 
 def stat_mod(stat):
-    return (stat-10)/2;
+    return int((stat-10)/2)
 
 def stat_modp(stat):
-    return ((stat-10)/2)*5;
+    return int(((stat-10)/2)*5)

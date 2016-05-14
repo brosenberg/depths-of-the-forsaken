@@ -1,5 +1,7 @@
 import json
 
+from utils import utils
+
 BASE_STATS = [
     "toughness",
     "agility",
@@ -120,7 +122,7 @@ class Actor(object):
     def _calculate_secondary_stats(self):
         self.stats["ap_max"] = 2*self.stats["agility"]
         self.stats["hp_max"] = self.stats["toughness"]
-        self.stats["sp_max"] = 2*self.stats["intelligence"]
+        self.stats["sp_max"] = self.stats["intelligence"]+self.stats["willpower"]
         self.stats["fatigue_max"] = 2*self.stats["toughness"]
 
         self.stats["ap_cur"] = self.stats["ap_max"]
@@ -135,17 +137,28 @@ class Actor(object):
             self.stats["ap_cur"] += self.stats["ap_max"] - old_ap
 
         old_hp = self.stats["hp_max"]
-        self.stats["hp_max"] = self.stats["toughness"]
+        level_hp = (self.level-1)*(utils.stat_mod(self.stats["toughness"]+5))
+        # This implies that the actor's toughness is less than zero, which is probably bad.
+        if level_hp < 0:
+            level_hp = 0
+        self.stats["hp_max"] = self.stats["toughness"] + level_hp
         if old_hp !=  self.stats["hp_max"]:
             self.stats["hp_cur"] += self.stats["hp_max"] - old_hp
 
         old_sp = self.stats["sp_max"]
-        self.stats["sp_max"] = 2*self.stats["intelligence"]
+        level_sp = (self.level-1)*(utils.stat_mod(self.stats["intelligence"]) + utils.stat_mod(self.stats["willpower"]))
+        # This implies that the actor's intelligence is less than zero, which is probably bad.
+        if level_sp < 0:
+            level_sp = 0
+        self.stats["sp_max"] = 2*self.stats["intelligence"] + level_sp
         if old_sp !=  self.stats["sp_max"]:
             self.stats["sp_cur"] += self.stats["sp_max"] - old_sp
 
         old_fatigue = self.stats["fatigue_max"]
-        self.stats["fatigue_max"] = 2*self.stats["toughness"]
+        level_fatigue  = (self.level-1)*(utils.stat_mod(self.stats["toughness"]*2))
+        if level_fatigue < 0:
+            level_fatigue = 0
+        self.stats["fatigue_max"] = 2*self.stats["toughness"] + level_fatigue
         if old_fatigue !=  self.stats["fatigue_max"]:
             self.stats["fatigue_cur"] += self.stats["fatigue_max"] - old_fatigue
 

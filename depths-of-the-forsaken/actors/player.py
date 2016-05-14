@@ -8,14 +8,18 @@ class Player(actors.Actor):
     def __init__(self, name, stats=None):
         super(self.__class__, self).__init__(name, stats=stats)
         self.experience = 0
+        self.karma = 0
         self.kills = 0
         self.lifespan = 0 # In turns
+        self.rests = 0 # Number of times rested
 
     def __repr__(self):
         r = self.pre_repr()
         r["experience"] = self.experience
+        r["karma"] = self.karma
         r["kills"] = self.kills
         r["lifespan"] = self.lifespan
+        r["rests"] = self.rests
         return json.dumps(r)
 
     def load(self, s):
@@ -25,11 +29,23 @@ class Player(actors.Actor):
         elif type(s) == dict:
             r = s
         self.experience = r.get("experience", self.experience)
+        self.karma = r.get("karma", self.karma)
         self.kills = r.get("kills", self.kills)
         self.lifespan = r.get("lifespan", self.lifespan)
+        self.rests = r.get("rests", self.rests)
+        self.recalculate_secondary_stats()
+
+    def level_up(self):
+        if self.experience >= next_level_xp(self.level):
+            self.level += 1
+            self.recalculate_secondary_stats()
+            return True
+        else:
+            return False
 
     def character_record(self):
-        s = "%s  Level %d\n\n" % (utils.color_text("purple", self.name), self.level)
+        s = "%s  Level %d\n" % (utils.color_text("purple", self.name), self.level)
+        s += "Experience: %d/%d\n\n" % (self.experience, next_level_xp(self.level))
         s += utils.color_text("cyan", "- Statistics -\n")
         for stat in actors.BASE_STATS:
             s += "%22s %s\n" % (utils.color_text("yellow", stat.title())+":", self.stats[stat])
@@ -38,6 +54,10 @@ class Player(actors.Actor):
             lstat = stat.lower()
             s += "%s %d/%d  " % (stat, self.stats[lstat+"_cur"], self.stats[lstat+"_max"])
         s += "\n"
+        # These should probably not be displayed. But show them for debug purposes
+        s += "Karma: %d\n" % (self.karma,)
+        s += "Kills: %d\n" % (self.kills,)
+        s += "Times rested: %d\n" % (self.rests,)
         s += "Time in the Depths: %d\n" % (self.lifespan,)
 
         s += utils.color_text("cyan", "\n- Equipped items -\n")
@@ -50,6 +70,9 @@ class Player(actors.Actor):
             s += "%s\n" % (items.str_item(item),)
         return s
 
+
+def next_level_xp(level):
+    return 500*(level*(level+1))
 
 def chargen():
     name = raw_input("What is your name? > ")
@@ -64,9 +87,9 @@ def chargen():
     print utils.color_text("yellow", "Perception")
     print "Determines nothing right now!"
     print utils.color_text("yellow", "Intelligence")
-    print "Determines nothing right now!"
+    print "Used to determine your spell points."
     print utils.color_text("yellow", "Willpower")
-    print "Determines nothing right now!"
+    print "Used to determine your spell points."
     print utils.color_text("yellow", "Charisma")
     print "Determines nothing right now!"
     print utils.color_text("yellow", "Luck")

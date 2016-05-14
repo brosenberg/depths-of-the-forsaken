@@ -66,7 +66,7 @@ def main():
         prompt =  "%s character sheet.\n" % (utils.color_text("green", "Show"),)
         prompt += "%s or %s the game.\n" % (utils.color_text("green", "Save"), utils.color_text("green", "load"))
         prompt += "%s an enemy.\n" % (utils.color_text("green", "Fight"),)
-        prompt += "%s for a short while.\n" % (utils.color_text("green", "Rest"),)
+        prompt += "%s for a short while. If you have enough experience to level up, you will level up upon resting.\n" % (utils.color_text("green", "Rest"),)
         prompt += "%s the game.\n" % (utils.color_text("green", "Quit"),)
         s = utils.get_expected_input(["show", "save", "load", "fight", "rest", "quit"], prompt).lower()
         if s == "show":
@@ -92,6 +92,9 @@ def main():
             pc.stats["sp_cur"] = pc.stats["sp_max"]
             pc.stats["fatigue_cur"] = pc.stats["fatigue_max"]
             pc.lifespan += 100
+            pc.rests += 1
+            if pc.level_up():
+                print utils.color_text("purple", "You have leveled up! You are now level %d!" % (pc.level,))
         elif s == "quit":
             break
     print "Good bye!"
