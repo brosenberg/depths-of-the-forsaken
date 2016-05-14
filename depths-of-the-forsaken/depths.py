@@ -59,18 +59,32 @@ def main():
     else:
         pc = player.chargen()
         save_game(pc)
-    pc.equip(items["stone knife"], "main hand")
-    #pc.equip(items["Father of Swords"], "main hand")
-    #pc.unequip("main hand")
-    monster = actors.Actor("Orc")
-    print pc.character_record()
-    return
-    fight = combat.Combat(pc, monster)
-    fight.main_loop()
-    if pc.stats["hp_cur"] < 1:
-        load_game(pc)
-    else:
-        save_game(pc)
+    while True:
+        print "What would you like to do?"
+        prompt =  "%s character sheet.\n" % (utils.color_text("green", "Show"),)
+        prompt += "%s or %s the game.\n" % (utils.color_text("green", "Save"), utils.color_text("green", "load"))
+        prompt += "%s an enemy.\n" % (utils.color_text("green", "Fight"),)
+        prompt += "%s the game.\n" % (utils.color_text("green", "Quit"),)
+        s = utils.get_expected_input(["show", "save", "load", "fight", "quit"], prompt).lower()
+        if s == "show":
+            print pc.character_record()
+        elif s == "save":
+            _save_game(pc)
+        elif s == "load":
+            _load_game(pc)
+        elif s == "fight":
+            monster = actors.Actor("Decaying Skeleton")
+            fight = combat.Combat(pc, monster)
+            fight.main_loop()
+            if pc.stats["hp_cur"] < 1:
+                p = "%s game or %s?\n" % (utils.color_text("green", "Load"), utils.color_text("green", "quit"))
+                r = utils.get_expected_input(["load", "quit"], p).lower()
+                if r == "load":
+                    load_game(pc)
+                else:
+                    break
+        elif s == "quit":
+            break
     print "Good bye!"
 
 if __name__ == '__main__':
