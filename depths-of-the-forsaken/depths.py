@@ -47,7 +47,8 @@ def save_game(pc):
             return
 
 def main():
-    items = utils.load_items()
+    actors = utils.load_file("actors.json")
+    items = utils.load_file("items.json")
     pc = player.Player("Bob")
     print "You have been banished to the Depths of the Forsaken!"
     prompt = "Would you like to %s a new character or %s an old one?\n" % (utils.color_text("green", "create"), utils.color_text("green", "load"))
