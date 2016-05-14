@@ -86,6 +86,7 @@ class Actor(object):
 
     def pre_repr(self):
         r = {}
+        r["base_actions"] = self.base_actions
         r["actions"] = self.actions
         r["display_name"] = self.display_name
         r["equipment"] = self.equipment
@@ -97,14 +98,14 @@ class Actor(object):
 
     def load(self, s):
         r = json.loads(s)
-        # TODO: This should set working defaults.
-        self.actions = r.get("actions", {})
-        self.display_name = r.get("display_name", "DEFAULT NAME")
-        self.equipment = r.get("equipment", {})
-        self.inventory = r.get("inventory", [])
-        self.level = r.get("level", 1)
-        self.name = r.get("name", "DEFAULT NAME")
-        self.stats = r.get("stats", {})
+        self.base_actions = r.get("base_actions", self.actions)
+        self.actions = r.get("actions", self.actions)
+        self.display_name = r.get("display_name", self.display_name)
+        self.equipment = r.get("equipment", self.equipment)
+        self.inventory = r.get("inventory", self.inventory)
+        self.level = r.get("level", self.level)
+        self.name = r.get("name", self.name)
+        self.stats = r.get("stats", self.stats)
 
     def _calculate_secondary_stats(self):
         self.stats["ap_max"] = 2*self.stats["agility"]

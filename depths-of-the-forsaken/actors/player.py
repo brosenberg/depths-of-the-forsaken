@@ -20,9 +20,9 @@ class Player(actors.Actor):
     def load(self, s):
         super(self.__class__, self).load(s)
         r = json.loads(s)
-        self.experience = r["experience"]
-        self.kills = r["kills"]
-        self.lifespan = r["lifespan"]
+        self.experience = r.get("experience", self.experience)
+        self.kills = r.get("kills", self.kills)
+        self.lifespan = r.get("lifespan", self.lifespan)
 
     def character_record(self):
         s = "%s  Level %d\n\n" % (utils.color_text("purple", self.name), self.level)
