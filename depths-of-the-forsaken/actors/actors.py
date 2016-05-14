@@ -129,7 +129,6 @@ class Actor(object):
         self.stats["fatigue_cur"] = self.stats["fatigue_max"]
 
     def recalculate_secondary_stats(self):
-        print self.stats
         old_ap = self.stats["ap_max"]
         self.stats["ap_max"] = 2*self.stats["agility"]
         if old_ap !=  self.stats["ap_max"]:
