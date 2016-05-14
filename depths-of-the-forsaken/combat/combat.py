@@ -70,7 +70,7 @@ class Combat(object):
             return ("%s waits." % (attacker.display_name,), True)
 
         if attacker.stats["ap_cur"] < action["ap"]:
-            return ("%s is out of actions." % (attacker.display_name,), False)
+            return ("%s does not have enough AP to %s." % (attacker.display_name, action_type), False)
         attacker.stats["ap_cur"] -= action["ap"]
 
         if attacker.stats["fatigue_cur"] < 1:
@@ -131,8 +131,11 @@ class Combat(object):
                 prompt += "\t%8s %2d AP\n" % (action_text, self.player.actions[action]["ap"])
                 prompt += "\t  %s\n" % (utils.color_text("grey", desc),)
             player_action = utils.get_expected_input(self.player.actions, prompt)
-            (action_output, _) = self.do_action(self.player, self.opponent,  player_action, self.player.actions[player_action])
-            print utils.color_text('yellow', action_output)
+            (action_output, success) = self.do_action(self.player, self.opponent,  player_action, self.player.actions[player_action])
+            if success:
+                print utils.color_text('yellow', action_output)
+            else:
+                print utils.color_text('red', action_output)
         self.player.stats["ap_cur"] = self.player.stats["ap_max"]
 
     def opponent_turn(self):

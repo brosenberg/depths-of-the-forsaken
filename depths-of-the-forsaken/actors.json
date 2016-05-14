@@ -4,9 +4,9 @@
             "approach": { "ap": 1 },
             "attack": {
                 "ap": 8,
+                "hit_desc": ["claws", "bites"],
                 "crit_desc": ["tears"],
                 "damage": [1, 3, 1],
-                "hit_desc": ["claws", "bites"],
                 "reach": 1
             },
             "run": { "ap": 10 },
@@ -17,9 +17,9 @@
             "approach": { "ap": 1 },
             "attack": {
                 "ap": 8,
+                "hit_desc": ["claws", "bites"],
                 "crit_desc": ["tears"],
                 "damage": [1, 3, 1],
-                "hit_desc": ["claws", "bites"],
                 "reach": 1
             },
             "run": { "ap": 10 },
@@ -36,15 +36,8 @@
             "intelligence": 8,
             "charisma": 0,
             "willpower": 10,
-            "luck": 10,
-            "ap_cur": 24,
-            "ap_max": 24,
-            "fatigue_cur": 24,
-            "fatigue_max": 24,
-            "hp_cur": 14,
-            "hp_max": 14,
-            "sp_cur": 16,
-            "sp_max": 16
-        }
+            "luck": 10
+        },
+        "recalc_secondary": true
     }
 }

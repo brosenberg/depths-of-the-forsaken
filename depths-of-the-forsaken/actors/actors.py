@@ -113,7 +113,9 @@ class Actor(object):
         self.inventory = r.get("inventory", self.inventory)
         self.level = r.get("level", self.level)
         self.name = r.get("name", self.name)
-        self.stats = r.get("stats", self.stats)
+        self.stats.update(r.get("stats", self.stats))
+        if r.get("recalc_secondary"):
+            self.recalculate_secondary_stats()
 
     def _calculate_secondary_stats(self):
         self.stats["ap_max"] = 2*self.stats["agility"]
@@ -125,6 +127,28 @@ class Actor(object):
         self.stats["hp_cur"] = self.stats["hp_max"]
         self.stats["sp_cur"] = self.stats["sp_max"]
         self.stats["fatigue_cur"] = self.stats["fatigue_max"]
+
+    def recalculate_secondary_stats(self):
+        print self.stats
+        old_ap = self.stats["ap_max"]
+        self.stats["ap_max"] = 2*self.stats["agility"]
+        if old_ap !=  self.stats["ap_max"]:
+            self.stats["ap_cur"] += self.stats["ap_max"] - old_ap
+
+        old_hp = self.stats["hp_max"]
+        self.stats["hp_max"] = self.stats["toughness"]
+        if old_hp !=  self.stats["hp_max"]:
+            self.stats["hp_cur"] += self.stats["hp_max"] - old_hp
+
+        old_sp = self.stats["sp_max"]
+        self.stats["sp_max"] = 2*self.stats["intelligence"]
+        if old_sp !=  self.stats["sp_max"]:
+            self.stats["sp_cur"] += self.stats["sp_max"] - old_sp
+
+        old_fatigue = self.stats["fatigue_max"]
+        self.stats["fatigue_max"] = 2*self.stats["toughness"]
+        if old_fatigue !=  self.stats["fatigue_max"]:
+            self.stats["fatigue_cur"] += self.stats["fatigue_max"] - old_fatigue
 
     def equip(self, item, slot):
         if self.equipment[slot] is not None:
