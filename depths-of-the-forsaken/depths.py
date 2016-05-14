@@ -62,6 +62,7 @@ def main():
         save_game(pc)
 
     while True:
+        # This is awful. Make it cleaner.
         print "What would you like to do?"
         prompt =  "%s character sheet.\n" % (utils.color_text("green", "Show"),)
         prompt += "%s or %s the game.\n" % (utils.color_text("green", "Save"), utils.color_text("green", "load"))

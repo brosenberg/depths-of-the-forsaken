@@ -36,12 +36,14 @@ class Player(actors.Actor):
         self.recalculate_secondary_stats()
 
     def level_up(self):
-        if self.experience >= next_level_xp(self.level):
+        old_level = self.level
+        while self.experience >= next_level_xp(self.level):
             self.level += 1
             self.recalculate_secondary_stats()
-            return True
-        else:
+        if old_level == self.level:
             return False
+        else:
+            return True
 
     def character_record(self):
         s = "%s  Level %d\n" % (utils.color_text("purple", self.name), self.level)

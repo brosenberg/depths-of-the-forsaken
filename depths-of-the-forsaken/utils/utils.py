@@ -70,5 +70,6 @@ def roll(*args):
 def stat_mod(stat):
     return int((stat-10)/2)
 
+# For percentile checks
 def stat_modp(stat):
-    return int(((stat-10)/2)*5)
+    return int(10*(stat-10))
