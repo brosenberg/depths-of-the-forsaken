@@ -10,6 +10,11 @@ BASE_STATS = [
     "luck"
 ]
 
+def load_actor(actor):
+    new_actor = Actor("DEFAULT NAME")
+    new_actor.load(actor)
+    return new_actor
+
 class Actor(object):
     def __init__(self, name, display_name=None, stats=None):
         self.name = name
