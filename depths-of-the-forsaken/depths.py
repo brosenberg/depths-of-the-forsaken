@@ -88,6 +88,7 @@ def main():
                 else:
                     break
         elif s == "rest":
+            # This should probably be its own function
             pc.stats["ap_cur"] = pc.stats["ap_max"]
             pc.stats["hp_cur"] = pc.stats["hp_max"]
             pc.stats["sp_cur"] = pc.stats["sp_max"]
