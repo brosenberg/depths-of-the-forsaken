@@ -26,4 +26,3 @@ class Room(object):
         self.egress = room.get("egress", self.egress)
         self.inhabitants = room.get("inhabitants", self.inhabitants)
         self.desc = room.get("desc", self.desc)
-        print self.egress
