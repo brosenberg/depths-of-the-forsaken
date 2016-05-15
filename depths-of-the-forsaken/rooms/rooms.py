@@ -10,7 +10,7 @@ class Room(object):
 
     def __str__(self):
         if self.desc == "":
-            s = "A %s room, %d by %d feet, with %d foot high ceilings." % (self.shape, self.length, self.width, self.height)
+            s = "a %s room, %d by %d feet, with %d foot high ceilings." % (self.shape, self.length, self.width, self.height)
             for exit in self.egress:
                 s += "\nThere's a %s on the %sern edge of the room." % (exit[1], exit[2])
             return s
