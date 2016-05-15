@@ -1,0 +1,31 @@
+{
+    "0": {
+        "shape": "rectangular",
+        "length": 30,
+        "width": 30,
+        "height": 10,
+        "egress": [[1, "door", "north"]]
+    },
+    "1": {
+        "shape": "rectangular",
+        "length": 40,
+        "width": 30,
+        "height": 10,
+        "egress": [[0, "door", "south"], [5, "door", "west"], [7, "door", "east"]]
+    },
+    "5": {
+        "shape": "rectangular",
+        "length": 30,
+        "width": 20,
+        "height": 10,
+        "egress": [[1, "door", "east"]]
+    },
+    "7": {
+        "shape": "rectangular",
+        "length": 30,
+        "width": 20,
+        "height": 10,
+        "inhabitants": ["decaying skeleton"],
+        "egress": [[1, "door", "west"]]
+    }
+}

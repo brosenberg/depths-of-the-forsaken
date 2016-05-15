@@ -20,6 +20,8 @@ def main():
     while True:
         print "Current room:"
         print dungeon[room]
+        if dungeon[room].inhabitants:
+            print "You encounter %s" % (" and ".join(dungeon[room].inhabitants),)
         i = 1
         expected = []
         for exit in dungeon[room].egress:
