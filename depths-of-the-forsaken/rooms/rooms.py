@@ -1,3 +1,14 @@
+from utils import files
+
+def load_dungeon(dungeon_file):
+    raw_dungeon = files.load_file(dungeon_file)
+    dungeon = {}
+    for room in raw_dungeon:
+        new_room = rooms.Room()
+        new_room.load(raw_dungeon[room])
+        dungeon[room] = new_room
+    return dungeon
+
 class Room(object):
     def __init__(self):
         self.shape = "square"
@@ -25,4 +36,5 @@ class Room(object):
         self.height = room.get("height", self.height)
         self.egress = room.get("egress", self.egress)
         self.inhabitants = room.get("inhabitants", self.inhabitants)
+
         self.desc = room.get("desc", self.desc)

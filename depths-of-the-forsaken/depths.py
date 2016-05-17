@@ -4,11 +4,12 @@ from actors import actors
 from actors import player
 from combat import combat
 from rooms import rooms
+from utils import files
 from utils import utils
 
-ACTORS = utils.load_file("actors.json")
-DUNGEON = utils.load_file("test-dungeon.json")
-ITEMS = utils.load_file("items.json")
+ACTORS = files.load_file("actors.json")
+DUNGEON = files.load_file("test-dungeon.json")
+ITEMS = files.load_file("items.json")
 
 # TODO: Move save and load to utils.
 def _load_game(pc):
