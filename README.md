@@ -3,6 +3,8 @@ Depths of the Forsaken
 
 This will be cool one day. (Probably not)
 
+A game written with no design process and maximal tech debt.
+
 ## Statistics
 
 #### Toughness

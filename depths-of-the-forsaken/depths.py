@@ -7,6 +7,7 @@ from actors import player
 from combat import combat
 from items import items
 from rooms import rooms
+from template import template
 from utils import files
 from utils import utils
 
@@ -64,11 +65,15 @@ def main_menu():
     pc = player.Player("")
     print_banner()
 
-    prompt =  "%s a new adventure\n" % (utils.color_text("green", "Start"),)
-    prompt += "%s a saved game\n" % (utils.color_text("green", "Load"),)
-    prompt += "%s to DOS\n" % (utils.color_text("green", "Quit"),)
+    t =  "<action>Start</action> a new adventure\n"
+    t += "<action>Load</action> a saved game\n"
+    t += "<action>Quit</action> to DOS\n"
 
-    s = utils.get_expected_input(["start", "load", "quit"], prompt)
+    (prompt, tags) = template.process(t)
+    actions = tags.get("action")
+
+    print actions
+    s = utils.get_expected_input(actions, prompt)
     if s == "quit":
         print "\nC:\>"
         sys.exit(0)
@@ -80,10 +85,11 @@ def main_menu():
     return pc
 
 def intro_blurb():
-    print utils.color_text("grey", "You awaken on the cold stone floor of a desolate room. A demonic nine foot tall creature with huge bat wings for arms and flesh that appears to be made from obsidian towers before you. It gazes down at you with fiery eyes. With a booming voice it declares:")
-    print utils.color_text("red", "\"Welcome to the Infinite Depths of the Forsaken. You are one of the Discarded; reincarnated from souls unwanted or worthless to the gods. You may have a horrid, pitiful person who amounted to nothing. Or perhaps you disgraced your god and your life. What ever you did, you are now here. Weak and under prepared. Here you will bring meaning back to your worthless soul.", bold=True)
-    print utils.color_text("red", "You will die here. No one will remember or care what you have done here. Accomplish something here so that in the next life you do not return here, so that I do not have to look upon you ever again.\"", bold=True)
-    print utils.color_text("grey", "Its eyes close and it wraps its wings around itself and stands motionless. You stand there stunned for a time before regaining your senses and looking around the room. On the floor nearby you see a corpse laying in dried pool of blood, its wrists slashed open and a crude stone knife clenced in one hand.")
+    t = "<desc>You awaken on the cold stone floor of a desolate room. A demonic nine foot tall creature with huge bat wings for arms and flesh that appears to be made from obsidian towers before you. It gazes down at you with fiery eyes. With a booming voice it declares:</desc>\n"
+    t += "<quote>\"Welcome to the Infinite Depths of the Forsaken. You are one of the Discarded; reincarnated from souls unwanted or worthless to the gods. You may have a horrid, pitiful person who amounted to nothing. Or perhaps you disgraced your god and your life. What ever you did, you are now here. Weak and under prepared. Here you will bring meaning back to your worthless soul."
+    t += "You will die here. No one will remember or care what you have done here. Accomplish something here so that in the next life you do not return here, so that I do not have to look upon you ever again.\"</quote>\n"
+    t += "<desc>Its eyes close and it wraps its wings around itself and stands motionless. You stand there stunned for a time before regaining your senses and looking around the room. On the floor nearby you see a corpse laying in dried pool of blood, its wrists slashed open and a crude stone knife clenced in one hand.</desc>"
+    print template.process(t)[1]
 
 def enter_dungeon(dungeon, pc, actor_db):
     intro_blurb()

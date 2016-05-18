@@ -24,6 +24,7 @@ def color_text(color, text, bold=False):
 
 def get_expected_input(expected, prompt=None):
     s = ""
+    expected = [x.lower() for x in expected]
     while s.lower() not in expected:
         if prompt:
             print prompt,
