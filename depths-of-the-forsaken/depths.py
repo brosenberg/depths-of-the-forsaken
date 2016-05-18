@@ -5,6 +5,7 @@ import sys
 from actors import actors
 from actors import player
 from combat import combat
+from items import items
 from rooms import rooms
 from utils import files
 from utils import utils
@@ -97,30 +98,60 @@ def enter_dungeon(dungeon, pc, actor_db):
             encounter = combat.Combat(pc, monster)
             encounter.main_loop()
         i = 1
-        expected = ["rest", "inventory"]
+        expected = ["camp", "inventory"]
         exits = {}
         prompt = "What would you like to do?\n"
         for exit in dungeon[room].egress:
             exit_name = "%s %d" % (exit[1], i)
             expected.append(exit_name)
             exits[exit_name] = str(exit[0])
-            prompt += "Go through %s on the %s wall\n" % (utils.color_text("green", exit_name), exit[2])
+            prompt += "Go through %s on the %s wall.\n" % (utils.color_text("green", exit_name), exit[2])
             i += 1
-        prompt += "Set up camp and %s\n" % (utils.color_text("green", "rest"),)
-        prompt += "Manage your %s\n" % (utils.color_text("green", "inventory"),)
+        prompt += "Set up %s.\n" % (utils.color_text("green", "camp"),)
+        prompt += "Manage your %s.\n" % (utils.color_text("green", "inventory"),)
         s = utils.get_expected_input(expected, prompt)
         if exits.get(s):
             room = exits[s]
-        elif s == "rest":
-            rest()
+        elif s == "camp":
+            rest(pc)
         elif s == "inventory":
-            inventory()
+            inventory(pc)
 
-def rest():
-    print "You rest."
+def rest(pc):
+    while True:
+        print "You attempt to make some semblance of a camp."
+        prompt =  "What would you like to do?\n"
+        prompt += "%s for a bit.\n" % (utils.color_text("green", "Rest"),)
+        prompt += "%s the game.\n" % (utils.color_text("green", "Save"),)
+        prompt += "%s a saved game.\n" % (utils.color_text("green", "Load"),)
+        prompt += "%s to DOS.\n" % (utils.color_text("green", "Quit"),)
+        prompt += "%s camp.\n" % (utils.color_text("green", "Break"),)
 
-def inventory():
-    print "Your inventory is now diamonds."
+        s = utils.get_expected_input(["rest", "save", "load", "quit", "break"], prompt)
+        if s == "rest":
+            pc.stats["ap_cur"] = pc.stats["ap_max"]
+            pc.stats["hp_cur"] = pc.stats["hp_max"]
+            pc.stats["sp_cur"] = pc.stats["sp_max"]
+            pc.stats["fatigue_cur"] = pc.stats["fatigue_max"]
+            pc.lifespan += 100
+            pc.rests += 1
+            if pc.level_up():
+                print utils.color_text("purple", "You have leveled up! You are now level %d!" % (pc.level,)) 
+        elif s == "save":
+            save_game(pc)
+        elif s == "load":
+            load_game(pc)
+        elif s == "quit":
+            print "\nC:\>"
+            sys.exit(0)
+        elif s == "break":
+            break
+
+def inventory(pc):
+    s = utils.color_text("cyan", "\n- Inventory -\n")
+    for item in sorted(pc.inventory):
+        s += "%s\n" % (items.str_item(item),)
+    print s
 
 def main():
     dungeon = rooms.load_dungeon("test-dungeon.json")
