@@ -1,5 +1,7 @@
 Rewrite the entirety of depths.py. It sucks.
 
+Either write a really simple templating language to generate the user input prompts and expected input stuff, or find a real UI to use. Doing it by hand each time is error prone and time consuming.
+
 General things to add:
 o When equipping items, check to see if the new item has a conflicting action with any other item. If it does, don't allow the new item to be equipped. OR: Keep track of each item's current active actions and ask the player which item's action they want to use. Then when unequipping an item only remove the actions that were active on that item. (Do the OR one. It's way better.)
 o Armor

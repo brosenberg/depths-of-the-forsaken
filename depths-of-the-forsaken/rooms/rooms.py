@@ -4,7 +4,7 @@ def load_dungeon(dungeon_file):
     raw_dungeon = files.load_file(dungeon_file)
     dungeon = {}
     for room in raw_dungeon:
-        new_room = rooms.Room()
+        new_room = Room()
         new_room.load(raw_dungeon[room])
         dungeon[room] = new_room
     return dungeon

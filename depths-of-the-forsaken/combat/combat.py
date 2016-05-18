@@ -170,8 +170,10 @@ class Combat(object):
 
         if self.player.stats["hp_cur"] < 1:
             print utils.color_text("purple", "%s has been slain." % (self.player.display_name,))
+            return False
         if self.opponent.stats["hp_cur"] < 1:
             print utils.color_text("purple", "%s has been slain." % (self.opponent.display_name,))
             self.player.lifespan += self.turn
             self.player.kills += 1
             self.player.experience += 50*self.opponent.level
+        return True

@@ -2,20 +2,24 @@ import json
 import random
 
 COLORS = {
-    'grey':   '\033[90m',
-    'red':    '\033[91m',
-    'green':  '\033[92m',
-    'yellow': '\033[93m',
-    'blue':   '\033[94m',
-    'purple': '\033[95m',
-    'cyan':   '\033[96m',
-    'white':  '\033[97m',
+    'grey':   '\033[90',
+    'red':    '\033[91',
+    'green':  '\033[92',
+    'yellow': '\033[93',
+    'blue':   '\033[94',
+    'purple': '\033[95',
+    'cyan':   '\033[96',
+    'white':  '\033[97',
     'reset':  '\033[0m'
 }
 
-def color_text(color, text):
+def color_text(color, text, bold=False):
     if color in COLORS:
-        return "%s%s%s" % (COLORS[color], text, COLORS['reset'])
+        color_out = COLORS[color]
+        if bold == True:
+            color_out += ";1"
+        color_out += "m"
+        return "%s%s%s" % (color_out, text, COLORS['reset'])
     else:
         return text
 
