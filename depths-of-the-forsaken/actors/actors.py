@@ -1,5 +1,6 @@
 import json
 
+from items import items
 from template import template
 from utils import utils
 
@@ -117,6 +118,7 @@ class Actor(object):
         self.display_name = r.get("display_name", self.display_name)
         self.equipment = r.get("equipment", self.equipment)
         self.inventory = r.get("inventory", self.inventory)
+        self.inventory.sort()
         self.level = r.get("level", self.level)
         self.name = r.get("name", self.name)
         self.stats.update(r.get("stats", self.stats))
@@ -192,7 +194,7 @@ class Actor(object):
     def unequip(self, first_item):
         unequipped = self._unequip(first_item)
         for item in unequipped:
-            self.inventory.append(unequipped[item])
+            self.inventory_add(unequipped[item])
         r = [utils.strart(unequipped[x]) for x in unequipped]
         s = "You've unequipped %s" % (", ".join(r),)
         return s
@@ -215,15 +217,33 @@ class Actor(object):
         s += "."
         return s
 
+    def inventory_add(self, item):
+        self.inventory.append(item)
+        self.inventory.sort()
+
+    def inventory_remove(self, item_no):
+        item = self.inventory[item_no]
+        del self.inventory[item_no]
+        return item
+
+    def get_inventory_str(self):
+        t = "<cyan>- Inventory -</cyan>\n"
+        i = 1
+        for item in self.inventory:
+            t += "<action>%d</action>: %s\n" % (i, items.str_item(item))
+            i += 1
+
+        return template.process(t)[0]
+
     def get_equipment_str(self):
-        s = "<cyan>- Equipped Items -</cyan>\n"
+        t = "<cyan>- Equipped Items -</cyan>\n"
         if self.equipment["main hand"] == self.equipment["off hand"]:
-            s += "%11s: %s\n" % ("Both Hands", utils.get_name(self.equipment["main hand"]))
+            t += "%11s: %s\n" % ("Both Hands", utils.get_name(self.equipment["main hand"]))
         else:
-            s += "%11s: %s\n" % ("Main Hand", utils.get_name(self.equipment["main hand"]))
-            s += "%11s: %s\n" % ("Off Hand", utils.get_name(self.equipment["off hand"]))
+            t += "%11s: %s\n" % ("Main Hand", utils.get_name(self.equipment["main hand"]))
+            t += "%11s: %s\n" % ("Off Hand", utils.get_name(self.equipment["off hand"]))
 
         for slot in ["head", "torso", "arms", "wrists", "hands", "legs", "feet"]:
-            s += "%11s: %s\n" % (slot.title(), utils.get_name(self.equipment[slot]))
+            t += "%11s: %s\n" % (slot.title(), utils.get_name(self.equipment[slot]))
 
-        return template.process(s)[0]
+        return template.process(t)[0]

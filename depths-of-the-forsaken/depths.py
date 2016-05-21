@@ -84,7 +84,7 @@ def main_menu():
         load_game(pc)
     elif s == "start":
         pc = player.chargen()
-        save_game_prompt()
+        save_game_prompt(pc)
     return pc
 
 def quit():
@@ -133,14 +133,20 @@ def enter_dungeon(dungeon, pc):
 def camp(pc):
     while True:
         print "You attempt to make some semblance of a camp."
-        prompt =  "What would you like to do?\n"
-        prompt += "%s for a bit.\n" % (utils.color_text("green", "Rest"),)
-        prompt += "%s the game.\n" % (utils.color_text("green", "Save"),)
-        prompt += "%s a saved game.\n" % (utils.color_text("green", "Load"),)
-        prompt += "%s to DOS.\n" % (utils.color_text("green", "Quit"),)
-        prompt += "%s camp.\n" % (utils.color_text("green", "Break"),)
 
-        s = utils.get_expected_input(["rest", "save", "load", "quit", "break"], prompt)
+        t =  "What would you like to do?\n"
+        t += "<action>Rest</action> for a bit.\n"
+        t += "<action>Save</action> the game.\n"
+        t += "<action>Load</action> a saved game.\n"
+        t += "<action>Review</action> your character sheet.\n"
+        t += "<action>Break</action> camp.\n"
+        t += "<action>Quit</action> to DOS.\n"
+
+        (prompt, tags) = template.process(t)
+
+        actions = tags.get("action")
+
+        s = utils.get_expected_input(actions, prompt)
         if s == "rest":
             pc.stats["ap_cur"] = pc.stats["ap_max"]
             pc.stats["hp_cur"] = pc.stats["hp_max"]
@@ -154,6 +160,8 @@ def camp(pc):
             save_game(pc)
         elif s == "load":
             load_game(pc)
+        elif s == "review":
+            print pc.character_record()
         elif s == "quit":
             quit()
         elif s == "break":
@@ -180,16 +188,15 @@ def main():
 def debug():
     pc = player.Player("")
     files.load_game(pc, "zash")
-    (s, _) = pc.equip(ITEMS["Father of Swords"])
+    pc.inventory = []
+    pc.inventory_add(ITEMS["hatchet"])
+    pc.inventory_add(ITEMS["stone spear"])
+    pc.inventory_add(ITEMS["stone knife"])
+    pc.inventory_add(ITEMS["Father of Swords"])
+    pc.inventory_remove(2)
     print pc.character_record()
-    print s
-    s = pc.unequip(pc.equipment["main hand"])
-    print s
-    (s, _) = pc.equip(ITEMS["stone knife"])
-    print s
-    print pc.character_record()
-    quit()
     files.save_game(pc, "zash")
+    quit()
 
 if __name__ == '__main__':
     main()

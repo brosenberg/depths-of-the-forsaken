@@ -65,9 +65,9 @@ class Player(actors.Actor):
         s += "\n"
         s += self.get_equipment_str()
 
-        s += utils.color_text("cyan", "\n- Inventory -\n")
-        for item in sorted(self.inventory):
-            s += "%s\n" % (items.str_item(item),)
+        s += "\n"
+        s += self.get_inventory_str()
+
         return s
 
 
