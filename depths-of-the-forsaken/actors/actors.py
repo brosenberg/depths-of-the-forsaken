@@ -1,5 +1,6 @@
 import json
 
+from template import template
 from utils import utils
 
 BASE_STATS = [
@@ -20,6 +21,7 @@ def load_actor(actor):
 class Actor(object):
     def __init__(self, name, display_name=None, stats=None):
         self.name = name
+        self.article = None
         if display_name:
             self.display_name = display_name
         else:
@@ -93,6 +95,7 @@ class Actor(object):
 
     def pre_repr(self):
         r = {}
+        r["article"] = self.article
         r["base_actions"] = self.base_actions
         r["actions"] = self.actions
         r["display_name"] = self.display_name
@@ -108,6 +111,7 @@ class Actor(object):
             r = json.loads(s)
         elif type(s) == dict:
             r = s
+        self.article = r.get("article", self.article)
         self.base_actions = r.get("base_actions", self.actions)
         self.actions = r.get("actions", self.actions)
         self.display_name = r.get("display_name", self.display_name)
@@ -158,27 +162,46 @@ class Actor(object):
         if old_fatigue !=  self.stats["fatigue_max"]:
             self.stats["fatigue_cur"] += self.stats["fatigue_max"] - old_fatigue
 
-    def equip(self, item, slot):
-        if self.equipment[slot] is not None:
-            for action in self.equipment[slot]["actions"]:
-                self.actions[action] = self.base_actions[action]
-            self.inventory.append(self.equipment[slot])
-        self.equipment[slot] = item
+    def equip(self, item):
+        for slot in item["slots"]:
+            if self.equipment[slot] is not None:
+                return ("You must unequip %s first." % (self.equipment[slot]["name"],), False)
+        for slot in item["slots"]:
+            self.equipment[slot] = item
         for action in item["actions"]:
             self.actions[action] = item["actions"][action]
+        return ("You've equipped %s" % (utils.strart(item).title(),), True)
 
-    def unequip(self, slot):
-        if self.equipment[slot] is not None:
-            for action in self.equipment[slot]["actions"]:
-                self.actions[action] = self.base_actions[action]
-            self.inventory.append(self.equipment[slot])
-        self.equipment[slot] = None
+    # If for some reason the actor's equipment is screwed up and they have
+    # multiple items equipped with overlapping slots, unequip all the
+    # offending items.
+    def _unequip(self, item):
+        if item is None:
+            return {}
+        r = {item["name"]: item}
+        for slot in item["slots"]:
+            if self.equipment[slot] is not None:
+                slot_item = self.equipment[slot]
+                self.equipment[slot] = None
+                r.update(self._unequip(slot_item))
+
+        for action in item["actions"]:
+            self.actions[action] = self.base_actions[action]
+        return r
+
+    def unequip(self, first_item):
+        unequipped = self._unequip(first_item)
+        for item in unequipped:
+            self.inventory.append(unequipped[item])
+        r = [utils.strart(unequipped[x]) for x in unequipped]
+        s = "You've unequipped %s" % (", ".join(r),)
+        return s
 
     def get_state(self):
         return str(self)
 
     def get_fuzzy_state(self):
-        s = "%s appears to be " % (self.display_name,)
+        s = "%s appears to be " % (utils.strart(self).title(),)
         if self.stats["hp_cur"] == self.stats["hp_max"]:
             s += "unharmed"
         elif float(self.stats["hp_cur"])/float(self.stats["hp_max"]) > .80:
@@ -191,3 +214,16 @@ class Actor(object):
             s += "near death"
         s += "."
         return s
+
+    def get_equipment_str(self):
+        s = "<cyan>- Equipped Items -</cyan>\n"
+        if self.equipment["main hand"] == self.equipment["off hand"]:
+            s += "%11s: %s\n" % ("Both Hands", utils.get_name(self.equipment["main hand"]))
+        else:
+            s += "%11s: %s\n" % ("Main Hand", utils.get_name(self.equipment["main hand"]))
+            s += "%11s: %s\n" % ("Off Hand", utils.get_name(self.equipment["off hand"]))
+
+        for slot in ["head", "torso", "arms", "wrists", "hands", "legs", "feet"]:
+            s += "%11s: %s\n" % (slot.title(), utils.get_name(self.equipment[slot]))
+
+        return template.process(s)[0]

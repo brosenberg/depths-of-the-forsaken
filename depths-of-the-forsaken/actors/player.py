@@ -62,10 +62,8 @@ class Player(actors.Actor):
         s += "Times rested: %d\n" % (self.rests,)
         s += "Time in the Depths: %d\n" % (self.lifespan,)
 
-        s += utils.color_text("cyan", "\n- Equipped items -\n")
-        for slot in sorted(self.equipment):
-            item = items.str_item(self.equipment[slot])
-            s += "%11s %s\n" % (slot.title()+":", item)
+        s += "\n"
+        s += self.get_equipment_str()
 
         s += utils.color_text("cyan", "\n- Inventory -\n")
         for item in sorted(self.inventory):

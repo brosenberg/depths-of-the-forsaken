@@ -74,3 +74,24 @@ def stat_mod(stat):
 # For percentile checks
 def stat_modp(stat):
     return int(10*(stat-10))
+
+def get_name(thing):
+    if thing is None:
+        return ""
+    try:
+        return thing["name"]
+    except KeyError:
+        return "{UNNAMED}"
+
+def strart(thing):
+    try:
+        if thing["article"]:
+            return "%s %s" % (thing["article"], thing["name"])
+    except TypeError:
+        if thing.article:
+            return "%s %s" % (thing.article, thing.name)
+        else:
+            return thing.name
+    except KeyError:
+        pass
+    return thing["name"]

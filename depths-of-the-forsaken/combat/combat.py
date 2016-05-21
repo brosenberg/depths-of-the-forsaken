@@ -5,7 +5,7 @@ from utils import utils
 
 
 class Combat(object):
-    def __init__(self, player, opponent, distance=1):
+    def __init__(self, player, opponent, distance=15):
         self.player = player
         self.opponent = opponent
         self.distance = distance
@@ -48,16 +48,16 @@ class Combat(object):
             (hit, damage, crit) = self._attack(attacker, defender, action["damage"])
             if crit:
                 desc = random.choice(action["crit_desc"])
-                s = "%s critically %s %s for %d damage!!!" % (attacker.display_name, desc, defender.display_name, damage)
+                s = "%s critically %s %s for %d damage!!!" % (utils.strart(attacker), desc, utils.strart(defender), damage)
             elif hit:
                 desc = random.choice(action["hit_desc"])
-                s = "%s %s %s for %d damage!" % (attacker.display_name, desc, defender.display_name, damage)
+                s = "%s %s %s for %d damage!" % (utils.strart(attacker), desc, utils.strart(defender), damage)
             else:
-                s = "%s missed %s!" % (attacker.display_name, defender.display_name)
+                s = "%s missed %s!" % (utils.strart(attacker), utils.strart(defender))
             return (hit, damage, s)
         else:
             attacker.stats["ap_cur"] += attacker.actions["attack"]["ap"]
-            return (0, 0, "%s is too far away to hit %s!" % (attacker.display_name, defender.display_name))
+            return (0, 0, "%s is too far away to hit %s!" % (utils.strart(attacker), utils.strart(defender)))
 
     # Returns ("String describing the action", Whether the action could be completed)
     def do_action(self, attacker, defender, action_type, action):
@@ -67,14 +67,14 @@ class Combat(object):
                 if attacker.stats["fatigue_cur"] > attacker.stats["fatigue_max"]:
                     attacker.stats["fatigue_cur"] = attacker.stats["fatigue_max"]
             attacker.stats["ap_cur"] = 0
-            return ("%s waits." % (attacker.display_name,), True)
+            return ("%s waits." % (utils.strart(attacker),), True)
 
         if attacker.stats["ap_cur"] < action["ap"]:
-            return ("%s does not have enough AP to %s." % (attacker.display_name, action_type), False)
+            return ("%s does not have enough AP to %s." % (utils.strart(attacker), action_type), False)
         attacker.stats["ap_cur"] -= action["ap"]
 
         if attacker.stats["fatigue_cur"] < 1:
-            return ("%s is too tired and should wait." % (attacker.display_name,), False)
+            return ("%s is too tired and should wait." % (utils.strart(attacker),), False)
 
         if action_type == "attack":
             attacker.stats["fatigue_cur"] -= 1
@@ -84,21 +84,21 @@ class Combat(object):
         if action_type == "approach":
             if self.distance > 1:
                 self.distance -= 1
-                return ("%s moves closer." % (attacker.display_name,), True)
+                return ("%s moves closer." % (utils.strart(attacker),), True)
             else:
-                return ("%s can't move any closer." % (attacker.display_name,), False)
+                return ("%s can't move any closer." % (utils.strart(attacker),), False)
 
         if action_type == "withdraw":
             self.distance += 1
-            return ("%s withdraws a foot." % (attacker.display_name,), True)
+            return ("%s withdraws a foot." % (utils.strart(attacker),), True)
 
         if action_type == "run":
             if self.distance < 20:
                 self.distance += 12
-                return ("%s attempts to run away!" % (attacker.display_name,), True)
+                return ("%s attempts to run away!" % (utils.strart(attacker),), True)
             else:
                 self.combat_complete = True
-                return ("%s has run away!" % (attacker.display_name,), True)
+                return ("%s has run away!" % (utils.strart(attacker),), True)
 
         raise Exception("Unknown action: %s" % (action,))
 
@@ -109,9 +109,9 @@ class Combat(object):
         #    print self.opponent.get_state()
         print self.opponent.get_fuzzy_state()
         if self.distance == 1:
-            print "You are 1 foot from the %s." % (self.opponent.display_name,)
+            print "You are 1 foot from %s." % (utils.strart(self.opponent),)
         else:
-            print "You are %d feet from the %s." % (self.distance, self.opponent.display_name)
+            print "You are %d feet from %s." % (self.distance, utils.strart(self.opponent))
 
     def player_turn(self):
         while self.player.stats["ap_cur"] > 0 and not self.combat_complete:
@@ -122,9 +122,9 @@ class Combat(object):
                 desc = self.player.base_actions[action]["desc"]
                 if action == "attack":
                     damage = self.player.actions[action]["damage"]
-                    weapon_name = "bare fists"
-                    if self.player.equipment.get("main hand"):
-                        weapon_name = self.player.equipment["main hand"]["name"]
+                    weapon_name = utils.strart(self.player.equipment["main hand"])
+                    if not weapon_name:
+                        weapon_name = "unarmed attacks"
                     min_dmg = damage[0]+damage[2]
                     max_dmg = (damage[0]*damage[1])+damage[2]
                     desc = desc % (weapon_name, min_dmg, max_dmg, self.player.actions[action]["reach"])
@@ -156,7 +156,7 @@ class Combat(object):
         self.opponent.stats["ap_cur"] = self.opponent.stats["ap_max"]
 
     def main_loop(self):
-        print "%s goes first!" % (self.initiative[0].display_name,)
+        print "%s goes first!" % (utils.strart(self.initiative[0]),)
         while not self.combat_complete:
             print utils.color_text('cyan', "Turn %d  %s" % (self.turn, "-"*20))
 
@@ -169,10 +169,10 @@ class Combat(object):
             self.turn += 1
 
         if self.player.stats["hp_cur"] < 1:
-            print utils.color_text("purple", "%s has been slain." % (self.player.display_name,))
+            print utils.color_text("purple", "%s has been slain." % (utils.strart(self.player),))
             return False
         if self.opponent.stats["hp_cur"] < 1:
-            print utils.color_text("purple", "%s has been slain." % (self.opponent.display_name,))
+            print utils.color_text("purple", "%s has been slain." % (utils.strart(self.opponent),))
             self.player.lifespan += self.turn
             self.player.kills += 1
             self.player.experience += 50*self.opponent.level

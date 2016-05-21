@@ -1,7 +1,9 @@
 {
     "stone knife": {
         "name": "stone knife",
+        "article": "a",
         "type": "weapon",
+        "slots": ["main hand"],
         "actions": {
             "attack": {
                 "ap": 8,
@@ -14,7 +16,9 @@
     },
     "Father of Swords": {
         "name": "Father of Swords",
+        "article": "the",
         "type": "weapon",
+        "slots": ["main hand", "off hand"],
         "actions": {
             "attack": {
                 "ap": 14,

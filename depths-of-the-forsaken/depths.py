@@ -11,6 +11,9 @@ from template import template
 from utils import files
 from utils import utils
 
+ACTORS = files.load_file("actors.json")
+ITEMS = files.load_file("items.json")
+
 def load_game(pc):
     print "Specify the path to the save file:"
     save_file = raw_input("> ")
@@ -72,11 +75,11 @@ def main_menu():
     (prompt, tags) = template.process(t)
     actions = tags.get("action")
 
-    print actions
-    s = utils.get_expected_input(actions, prompt)
+    s = utils.get_expected_input(actions + ["debug"], prompt)
     if s == "quit":
-        print "\nC:\>"
-        sys.exit(0)
+        quit()
+    elif s == "debug":
+        debug()
     elif s == "load":
         load_game(pc)
     elif s == "start":
@@ -84,14 +87,18 @@ def main_menu():
         save_game_prompt()
     return pc
 
+def quit():
+    print "\nC:\>"
+    sys.exit(0)
+
 def intro_blurb():
     t = "<desc>You awaken on the cold stone floor of a desolate room. A demonic nine foot tall creature with huge bat wings for arms and flesh that appears to be made from obsidian towers before you. It gazes down at you with fiery eyes. With a booming voice it declares:</desc>\n"
     t += "<quote>\"Welcome to the Infinite Depths of the Forsaken. You are one of the Discarded; reincarnated from souls unwanted or worthless to the gods. You may have a horrid, pitiful person who amounted to nothing. Or perhaps you disgraced your god and your life. What ever you did, you are now here. Weak and under prepared. Here you will bring meaning back to your worthless soul."
     t += "You will die here. No one will remember or care what you have done here. Accomplish something here so that in the next life you do not return here, so that I do not have to look upon you ever again.\"</quote>\n"
     t += "<desc>Its eyes close and it wraps its wings around itself and stands motionless. You stand there stunned for a time before regaining your senses and looking around the room. On the floor nearby you see a corpse laying in dried pool of blood, its wrists slashed open and a crude stone knife clenced in one hand.</desc>"
-    print template.process(t)[1]
+    print template.process(t)[0]
 
-def enter_dungeon(dungeon, pc, actor_db):
+def enter_dungeon(dungeon, pc):
     intro_blurb()
     room = "0"
     while True:
@@ -100,7 +107,7 @@ def enter_dungeon(dungeon, pc, actor_db):
         if dungeon[room].inhabitants:
             monster_name = dungeon[room].inhabitants[0]
             print "You encounter %s" % (monster_name,)
-            monster = actors.load_actor(actor_db[monster_name])
+            monster = actors.load_actor(ACTORS[monster_name])
             encounter = combat.Combat(pc, monster)
             encounter.main_loop()
         i = 1
@@ -119,11 +126,11 @@ def enter_dungeon(dungeon, pc, actor_db):
         if exits.get(s):
             room = exits[s]
         elif s == "camp":
-            rest(pc)
+            camp(pc)
         elif s == "inventory":
             inventory(pc)
 
-def rest(pc):
+def camp(pc):
     while True:
         print "You attempt to make some semblance of a camp."
         prompt =  "What would you like to do?\n"
@@ -148,8 +155,7 @@ def rest(pc):
         elif s == "load":
             load_game(pc)
         elif s == "quit":
-            print "\nC:\>"
-            sys.exit(0)
+            quit()
         elif s == "break":
             break
 
@@ -160,12 +166,30 @@ def inventory(pc):
     print s
 
 def main():
+    try:
+        if sys.argv[1] == "debug":
+            debug()
+    except IndexError:
+        pass
     dungeon = rooms.load_dungeon("test-dungeon.json")
-    actor_db = files.load_file("actors.json")
-    item_db = files.load_file("items.json")
     while True:
         pc = main_menu()
-        enter_dungeon(dungeon, pc, actor_db)
+        enter_dungeon(dungeon, pc)
+
+# This should probably all be tests.
+def debug():
+    pc = player.Player("")
+    files.load_game(pc, "zash")
+    (s, _) = pc.equip(ITEMS["Father of Swords"])
+    print pc.character_record()
+    print s
+    s = pc.unequip(pc.equipment["main hand"])
+    print s
+    (s, _) = pc.equip(ITEMS["stone knife"])
+    print s
+    print pc.character_record()
+    quit()
+    files.save_game(pc, "zash")
 
 if __name__ == '__main__':
     main()

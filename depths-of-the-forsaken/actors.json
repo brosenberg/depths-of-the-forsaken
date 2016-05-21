@@ -1,5 +1,8 @@
 {
     "decaying skeleton": {
+        "name": "Decaying Skeleton",
+        "display_name": "Decaying Skeleton",
+        "article": "the",
         "actions": {
             "approach": { "ap": 1 },
             "attack": {
@@ -26,9 +29,7 @@
             "wait": { "ap": 0 },
             "withdraw": { "ap": 1 }
         },
-        "display_name": "Decaying Skeleton",
         "level": 1,
-        "name": "Decaying Skeleton",
         "stats": {
             "toughness": 14,
             "agility": 12,
