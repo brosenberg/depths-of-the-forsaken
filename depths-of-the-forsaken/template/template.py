@@ -17,8 +17,9 @@ def process(t):
         tags[color] = utils.COLORS[color]
     found_tags = {}
     for tag in tags:
-        find = r'<%s>(.+?)</%s>' % (tag, tag)
+        find = r'<%s>(.*?)</%s>' % (tag, tag)
         repl = r'%s\1%s' % (tags[tag], RESET)
-        found_tags[tag] = re.findall(find, t)
+        found_tags[tag] = [x for x in list(set(re.findall(find, t))) if x != ""]
+
         t = re.sub(find, repl, t)
     return (t, found_tags)

@@ -226,24 +226,30 @@ class Actor(object):
         del self.inventory[item_no]
         return item
 
-    def get_inventory_str(self):
+    def get_inventory_template(self):
         t = "<cyan>- Inventory -</cyan>\n"
-        i = 1
+        i = 0
         for item in self.inventory:
             t += "<action>%d</action>: %s\n" % (i, items.str_item(item))
             i += 1
 
-        return template.process(t)[0]
+        return t
 
-    def get_equipment_str(self):
+    def get_inventory_str(self):
+        return template.process(self.get_inventory_template())[0]
+
+    def get_equipment_template(self):
         t = "<cyan>- Equipped Items -</cyan>\n"
         if self.equipment["main hand"] == self.equipment["off hand"]:
-            t += "%11s: %s\n" % ("Both Hands", utils.get_name(self.equipment["main hand"]))
+            t += "%11s: <action>%s</action>\n" % ("Both Hands", utils.get_name(self.equipment["main hand"]))
         else:
-            t += "%11s: %s\n" % ("Main Hand", utils.get_name(self.equipment["main hand"]))
-            t += "%11s: %s\n" % ("Off Hand", utils.get_name(self.equipment["off hand"]))
+            t += "%11s: <action>%s</action>\n" % ("Main Hand", utils.get_name(self.equipment["main hand"]))
+            t += "%11s: <action>%s</action>\n" % ("Off Hand", utils.get_name(self.equipment["off hand"]))
 
         for slot in ["head", "torso", "arms", "wrists", "hands", "legs", "feet"]:
-            t += "%11s: %s\n" % (slot.title(), utils.get_name(self.equipment[slot]))
+            t += "%11s: <action>%s</action>\n" % (slot.title(), utils.get_name(self.equipment[slot]))
 
-        return template.process(t)[0]
+        return t
+
+    def get_equipment_str(self):
+        return template.process(self.get_equipment_template())[0]

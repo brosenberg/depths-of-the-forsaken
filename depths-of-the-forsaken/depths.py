@@ -18,6 +18,7 @@ def load_game(pc):
     print "Specify the path to the save file:"
     save_file = raw_input("> ")
     files.load_game(pc, save_file)
+    return True
 
 def load_game_prompt(pc):
     loaded = False
@@ -32,6 +33,7 @@ def save_game(pc):
     print "Specify the path to the save file:"
     save_file = raw_input("> ")
     files.save_game(pc, save_file)
+    return True
 
 def save_game_prompt(pc):
     saved = False
@@ -131,8 +133,8 @@ def enter_dungeon(dungeon, pc):
             inventory(pc)
 
 def camp(pc):
+    print "You attempt to make some semblance of a camp."
     while True:
-        print "You attempt to make some semblance of a camp."
 
         t =  "What would you like to do?\n"
         t += "<action>Rest</action> for a bit.\n"
@@ -155,7 +157,7 @@ def camp(pc):
             pc.lifespan += 100
             pc.rests += 1
             if pc.level_up():
-                print utils.color_text("purple", "You have leveled up! You are now level %d!" % (pc.level,)) 
+                print utils.color_text("purple", "You have leveled up! You are now level %d!" % (pc.level,))
         elif s == "save":
             save_game(pc)
         elif s == "load":
@@ -168,10 +170,47 @@ def camp(pc):
             break
 
 def inventory(pc):
-    s = utils.color_text("cyan", "\n- Inventory -\n")
-    for item in sorted(pc.inventory):
-        s += "%s\n" % (items.str_item(item),)
-    print s
+    while True:
+        print pc.get_equipment_str()
+        print pc.get_inventory_str()
+        t  = "What would you like to do?\n"
+        t += "<action>Equip</action> an item.\n"
+        t += "<action>Unequip</action> an item.\n"
+        t += "<action>Destroy</action> an item.\n"
+        t += "<action>Finish</action> managing your inventory.\n"
+        (prompt, tags) = template.process(t)
+
+        actions = tags.get("action")
+
+        s = utils.get_expected_input(actions, prompt)
+        if s == "equip":
+            (_, tags) = template.process(pc.get_inventory_template())
+            actions = tags.get("action")
+            item_no = int(utils.get_expected_input(actions, "Which item?"))
+            item = pc.inventory_remove(item_no)
+            (equip_s, equipped) = pc.equip(item)
+            if equipped:
+                print equip_s
+            else:
+                pc.inventory_add(item)
+                print equip_s
+
+        # TODO: Oh god this doesn't work. Make unequipping actually work.
+        elif s == "unequip":
+            (_, tags) = template.process(pc.get_equipment_template())
+            actions = tags.get("action")
+            prompt = "Which item?"
+            item = utils.get_expected_input(actions, prompt)
+            print pc.unequip(item)
+
+        if s == "destroy":
+            (_, tags) = template.process(pc.get_inventory_template())
+            actions = tags.get("action")
+            item_no = int(utils.get_expected_input(actions, "Which item?"))
+            pc.inventory_remove(item_no)
+
+        if s == "finish":
+            break
 
 def main():
     try:
@@ -187,15 +226,14 @@ def main():
 # This should probably all be tests.
 def debug():
     pc = player.Player("")
-    files.load_game(pc, "zash")
+    files.load_game(pc, "debug_char")
     pc.inventory = []
     pc.inventory_add(ITEMS["hatchet"])
     pc.inventory_add(ITEMS["stone spear"])
     pc.inventory_add(ITEMS["stone knife"])
     pc.inventory_add(ITEMS["Father of Swords"])
-    pc.inventory_remove(2)
-    print pc.character_record()
-    files.save_game(pc, "zash")
+    inventory(pc)
+    files.save_game(pc, "debug_char")
     quit()
 
 if __name__ == '__main__':
