@@ -195,13 +195,14 @@ def inventory(pc):
                 pc.inventory_add(item)
                 print equip_s
 
-        # TODO: Oh god this doesn't work. Make unequipping actually work.
         elif s == "unequip":
             (_, tags) = template.process(pc.get_equipment_template())
             actions = tags.get("action")
-            prompt = "Which item?"
-            item = utils.get_expected_input(actions, prompt)
-            print pc.unequip(item)
+            prompt = "Which equipment slot?"
+            slot = utils.get_expected_input(actions, prompt)
+            if slot == "both hands":
+                slot = "main hand"
+            print pc.unequip(slot)
 
         if s == "destroy":
             (_, tags) = template.process(pc.get_inventory_template())

@@ -177,7 +177,8 @@ class Actor(object):
     # If for some reason the actor's equipment is screwed up and they have
     # multiple items equipped with overlapping slots, unequip all the
     # offending items.
-    def _unequip(self, item):
+    def _unequip(self, base_slot):
+        item = self.equipment[base_slot]
         if item is None:
             return {}
         r = {item["name"]: item}
@@ -185,7 +186,7 @@ class Actor(object):
             if self.equipment[slot] is not None:
                 slot_item = self.equipment[slot]
                 self.equipment[slot] = None
-                r.update(self._unequip(slot_item))
+                r.update(self._unequip(slot))
 
         for action in item["actions"]:
             self.actions[action] = self.base_actions[action]
@@ -241,13 +242,13 @@ class Actor(object):
     def get_equipment_template(self):
         t = "<cyan>- Equipped Items -</cyan>\n"
         if self.equipment["main hand"] == self.equipment["off hand"]:
-            t += "%11s: <action>%s</action>\n" % ("Both Hands", utils.get_name(self.equipment["main hand"]))
+            t += "<action>%11s</action>: %s\n" % ("Both Hands", utils.get_name(self.equipment["main hand"]))
         else:
-            t += "%11s: <action>%s</action>\n" % ("Main Hand", utils.get_name(self.equipment["main hand"]))
-            t += "%11s: <action>%s</action>\n" % ("Off Hand", utils.get_name(self.equipment["off hand"]))
+            t += "<action>%11s</action>: %s\n" % ("Main Hand", utils.get_name(self.equipment["main hand"]))
+            t += "<action>%11s</action>: %s\n" % ("Off Hand", utils.get_name(self.equipment["off hand"]))
 
         for slot in ["head", "torso", "arms", "wrists", "hands", "legs", "feet"]:
-            t += "%11s: <action>%s</action>\n" % (slot.title(), utils.get_name(self.equipment[slot]))
+            t += "<action>%11s</action>: %s\n" % (slot.title(), utils.get_name(self.equipment[slot]))
 
         return t
 
