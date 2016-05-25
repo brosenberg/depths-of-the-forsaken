@@ -15,25 +15,25 @@ ACTORS = files.load_file("actors.json")
 ITEMS = files.load_file("items.json")
 
 def load_game(pc):
-    print "Specify the path to the save file:"
-    save_file = raw_input("> ")
-    files.load_game(pc, save_file)
-    return True
-
-def load_game_prompt(pc):
     loaded = False
     while not loaded:
-        print "Would you like to load your game?"
-        if utils.get_yesno_input():
-            loaded = load_game(pc)
-        else:
-            return
+        print "Specify the path to the save file:"
+        save_file = raw_input("> ")
+        loaded = files.load_game(pc, save_file)
+        if not loaded:
+            print "Could not load file '%s'" % (save_file,)
+
+def load_game_prompt(pc):
+    print "Would you like to load your game?"
+    if utils.get_yesno_input():
+        load_game(pc)
+    else:
+        return
 
 def save_game(pc):
     print "Specify the path to the save file:"
     save_file = raw_input("> ")
-    files.save_game(pc, save_file)
-    return True
+    return files.save_game(pc, save_file)
 
 def save_game_prompt(pc):
     saved = False
