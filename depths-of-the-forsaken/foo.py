@@ -26,6 +26,16 @@ def main():
         background.blit(text, textpos)
         offset += 11
 
+    # Draw button
+    pygame.draw.rect(background, (200, 0, 0), (300, 520, 200, 30))
+    pygame.draw.rect(background, (0, 0, 0), (303, 523, 194, 24))
+    font = pygame.font.Font(None, 30)
+    text = font.render("Enter", 1, (200, 0, 0))
+    textpos = text.get_rect()
+    textpos.centerx = background.get_rect().centerx
+    textpos[1] += 525
+    background.blit(text, textpos)
+
     # Blit everything to the screen
     screen.blit(background, (0, 0))
     pygame.display.flip()
