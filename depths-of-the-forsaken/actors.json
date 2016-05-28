@@ -1,7 +1,6 @@
 {
     "decaying skeleton": {
         "name": "Decaying Skeleton",
-        "display_name": "Decaying Skeleton",
         "article": "the",
         "actions": {
             "approach": { "ap": 1 },

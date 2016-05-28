@@ -84,14 +84,18 @@ def get_name(thing):
         return "{UNNAMED}"
 
 def strart(thing):
+    if thing is None:
+        return ""
     try:
-        if thing["article"]:
-            return "%s %s" % (thing["article"], thing["name"])
-    except TypeError:
-        if thing.article:
-            return "%s %s" % (thing.article, thing.name)
-        else:
-            return thing.name
-    except KeyError:
+        return "%s %s" % (thing["article"], thing["name"])
+    except TypeError, KeyError:
+        pass
+    try:
+        return "%s %s" % (thing.article, thing.name)
+    except AttributeError:
+        pass
+    try:
+        return thing.name
+    except AttributeError:
         pass
     return thing["name"]

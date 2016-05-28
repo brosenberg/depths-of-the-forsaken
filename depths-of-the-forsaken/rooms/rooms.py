@@ -63,15 +63,12 @@ class Room(object):
         self.desc = kwargs.get("desc")
 
     def __str__(self):
-        if self.desc == "":
-            s = "a %s room, %d by %d feet, with %d foot high ceilings." % (self.shape, self.length, self.width, self.height)
-            if self.desc:
-                s += "\n%s" % (self.desc,)
-            for exit in self.egress:
-                s += "\nThere's a %s on the %sern edge of the room." % (exit[1], exit[2])
-            return s
-        else:
-            return desc
+       s = "a %s room, %d by %d feet, with %d foot high ceilings." % (self.shape, self.length, self.width, self.height)
+       if self.desc:
+           s += "\n%s" % (self.desc,)
+       for exit in self.egress:
+           s += "\nThere's a %s on the %sern edge of the room." % (exit[1], exit[2])
+       return s
 
     def load(self, room):
         self.shape = room.get("shape", self.shape)
