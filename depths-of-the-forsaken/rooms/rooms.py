@@ -20,6 +20,8 @@ def dump_dungeon(dungeon):
                                        dungeon[room].shape)
         if dungeon[room].desc:
             s += "\n%s" % (dungeon[room].desc,)
+        if len(dungeon[room].inhabitants):
+            s += "\nOccupied by: %s" % (", ".join(dungeon[room].inhabitants),)
         for egress in dungeon[room].egress:
             s += "\n\t%s to the %s, leads to room %d" % (egress[1],
                                                        egress[2],
@@ -31,6 +33,7 @@ class EndlessLinearDungeon(object):
         self.dungeon = {}
         self.rooms = 0
         self.monster_db = monster_db
+        self.gen_room()
 
     def gen_room(self, count=1):
         while count > 0:
@@ -44,7 +47,7 @@ class EndlessLinearDungeon(object):
             egress.append([self.rooms+1, "door", "north"])
             if self.rooms != 0:
                 egress.append([self.rooms-1, "door", "south"])
-            inhabitants = []
+            inhabitants = [random.choice(self.monster_db.keys())]
             room = Room(width=w, length=l, height=h, shape=shape,
                         egress=egress, inhabitants=inhabitants)
             self.dungeon[self.rooms] = room

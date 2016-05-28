@@ -98,4 +98,7 @@ def strart(thing):
         return thing.name
     except AttributeError:
         pass
-    return thing["name"]
+    try:
+        return thing["name"]
+    except TypeError, KeyError:
+        return ""

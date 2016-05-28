@@ -1,4 +1,45 @@
 {
+    "crazed humanoid": {
+        "name": "Crazed Humanoid",
+        "article": "the",
+        "actions": {
+            "approach": { "ap": 1 },
+            "attack": {
+                "ap": 8,
+                "hit_desc": ["punches", "kicks"],
+                "crit_desc": ["bites"],
+                "damage": [1, 4, 0],
+                "reach": 1
+            },
+            "run": { "ap": 10 },
+            "wait": { "ap": 0 },
+            "withdraw": { "ap": 1 }
+        },
+        "base_actions": {
+            "approach": { "ap": 1 },
+            "attack": {
+                "ap": 8,
+                "hit_desc": ["punches", "kicks"],
+                "crit_desc": ["bites"],
+                "damage": [1, 4, 0],
+                "reach": 1
+            },
+            "run": { "ap": 10 },
+            "wait": { "ap": 0 },
+            "withdraw": { "ap": 1 }
+        },
+        "level": 1,
+        "stats": {
+            "toughness": 16,
+            "agility": 14,
+            "perception": 6,
+            "intelligence": 6,
+            "charisma": 0,
+            "willpower": 8,
+            "luck": 8
+        },
+        "recalc_secondary": true
+    },
     "decaying skeleton": {
         "name": "Decaying Skeleton",
         "article": "the",
