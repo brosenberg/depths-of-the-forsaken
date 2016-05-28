@@ -3,6 +3,8 @@
 
 import pygame
 
+FONT="fonts/Cousine-Regular.ttf"
+
 def main():
     # Initialise screen
     pygame.init()
@@ -18,7 +20,7 @@ def main():
     s = open("banner").read()
     offset = 15
     for line in s.split("\n"):
-        font = pygame.font.SysFont("monospace", 10)
+        font = pygame.font.Font(FONT, 10)
         text = font.render(line, 1, (240, 0, 0))
         textpos = text.get_rect()
         textpos.centerx = background.get_rect().centerx
@@ -29,7 +31,7 @@ def main():
     # Draw button
     pygame.draw.rect(background, (200, 0, 0), (300, 520, 200, 30))
     pygame.draw.rect(background, (0, 0, 0), (303, 523, 194, 24))
-    font = pygame.font.Font(None, 30)
+    font = pygame.font.Font(FONT, 20)
     text = font.render("Enter", 1, (200, 0, 0))
     textpos = text.get_rect()
     textpos.centerx = background.get_rect().centerx
