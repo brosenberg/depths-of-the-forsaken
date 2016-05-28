@@ -4,6 +4,7 @@
         "length": 30,
         "width": 30,
         "height": 10,
+        "desc": "A hellish vault",
         "egress": [[1, "door", "north"]]
     },
     "1": {

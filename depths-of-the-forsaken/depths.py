@@ -233,7 +233,9 @@ def debug():
     pc.inventory_add(ITEMS["stone spear"])
     pc.inventory_add(ITEMS["stone knife"])
     pc.inventory_add(ITEMS["Father of Swords"])
-    inventory(pc)
+    dungeon = rooms.EndlessLinearDungeon(ACTORS)
+    dungeon.gen_room(count=5)
+    rooms.dump_dungeon(dungeon.dungeon)
     files.save_game(pc, "debug_char")
     quit()
 

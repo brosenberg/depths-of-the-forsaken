@@ -16,7 +16,7 @@ class RandomDungeon(object):
     def __str__(self):
         s = ""
         for i in self.m:
-            s += "%s\n" % (" ".join(i),)
+            s += "%s\n" % ("".join(i),)
         s += "\n"
         for room in self.rooms:
             s += "%s: " % (room,)
@@ -28,7 +28,7 @@ class RandomDungeon(object):
     def generate(self):
         self.m = [[" " for x in range(self.size)] for y in range(self.size)]
         self.gen_room()
-        for i in range(8):
+        for i in range(30):
             self.gen_room()
 
     # Because why not do O(N^2) twice?
@@ -43,10 +43,10 @@ class RandomDungeon(object):
         room_no = len(self.rooms)
         for i in range(x, x+w):
             for j in range(y, y+l):
-                if (i, j) == c:
-                    self.m[j][i] = str(room_no)
+                if (i, j) == (x, y):
+                    self.m[j][i]     = "%d" % (room_no,)
                 else:
-                    self.m[j][i] = '.'
+                    self.m[j][i]     = '.'
         self.rooms[room_no] = (x, x+w, y, y+l)
         return True
 
