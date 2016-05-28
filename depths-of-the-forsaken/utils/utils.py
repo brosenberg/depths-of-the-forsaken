@@ -87,18 +87,21 @@ def strart(thing):
     if thing is None:
         return ""
     try:
-        return "%s %s" % (thing["article"], thing["name"])
-    except TypeError, KeyError:
+        if thing.get("aritcle"):
+            return "%s %s" % (thing["article"], thing["name"])
+        else:
+            return thing["name"]
+    except (AttributeError, TypeError, KeyError):
         pass
     try:
-        return "%s %s" % (thing.article, thing.name)
+        if thing.article:
+            return "%s %s" % (thing.article, thing.name)
+        else:
+            return thing.name
     except AttributeError:
         pass
     try:
         return thing.name
     except AttributeError:
         pass
-    try:
-        return thing["name"]
-    except TypeError, KeyError:
-        return ""
+    return ""
