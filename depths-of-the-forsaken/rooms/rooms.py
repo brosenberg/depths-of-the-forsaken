@@ -33,7 +33,7 @@ class EndlessLinearDungeon(object):
         self.dungeon = {}
         self.rooms = 0
         self.monster_db = monster_db
-        self.gen_room()
+        #self.gen_room()
 
     def gen_room(self, count=1):
         while count > 0:
@@ -50,7 +50,7 @@ class EndlessLinearDungeon(object):
             inhabitants = [random.choice(self.monster_db.keys())]
             room = Room(width=w, length=l, height=h, shape=shape,
                         egress=egress, inhabitants=inhabitants)
-            self.dungeon[self.rooms] = room
+            self.dungeon[str(self.rooms)] = room
             self.rooms += 1
             count -= 1
 

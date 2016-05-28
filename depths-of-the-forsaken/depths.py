@@ -104,10 +104,13 @@ def enter_dungeon(dungeon, pc):
     intro_blurb()
     room = "0"
     while True:
+        if not dungeon.dungeon.get(room):
+            new_rooms = 1 + int(room) - dungeon.rooms
+            dungeon.gen_room(count=new_rooms)
         print utils.color_text("purple", "-"*80)
-        print "You are in a %s" % (dungeon[room],)
-        if dungeon[room].inhabitants:
-            monster_name = dungeon[room].inhabitants[0]
+        print "You are in a %s" % (dungeon.dungeon[room],)
+        if dungeon.dungeon[room].inhabitants:
+            monster_name = dungeon.dungeon[room].inhabitants[0]
             print "You encounter %s" % (monster_name,)
             monster = actors.load_actor(ACTORS[monster_name])
             encounter = combat.Combat(pc, monster)
@@ -116,7 +119,7 @@ def enter_dungeon(dungeon, pc):
         expected = ["camp", "inventory"]
         exits = {}
         prompt = "What would you like to do?\n"
-        for exit in dungeon[room].egress:
+        for exit in dungeon.dungeon[room].egress:
             exit_name = "%s %d" % (exit[1], i)
             expected.append(exit_name)
             exits[exit_name] = str(exit[0])
@@ -219,9 +222,9 @@ def main():
             debug()
     except IndexError:
         pass
-    dungeon = rooms.load_dungeon("test-dungeon.json")
     while True:
         pc = main_menu()
+        dungeon = rooms.EndlessLinearDungeon(ACTORS)
         enter_dungeon(dungeon, pc)
 
 # This should probably all be tests.
