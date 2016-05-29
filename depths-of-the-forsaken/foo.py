@@ -48,6 +48,7 @@ class Button(DrawThing):
     def __init__(self, surface_ref, x_pos, y_pos, x_size, y_size, **kwargs):
         super(self.__class__, self).__init__()
         self.can_highlight = True
+        self.can_press = True
 
         self.surface_ref = surface_ref
 
@@ -66,8 +67,10 @@ class Button(DrawThing):
             self.font = pygame.font.Font(font, font_size)
             self.text_color = kwargs.get("text_color", self.border_color)
             self.text = self.font.render(text, 1, self.text_color)
+            self.text_raw = text
         else:
             self.text = None
+            self.text_raw = None
 
     def draw(self, highlight=False):
         self.surface_ref.fill(self.border_color, self.rect)
@@ -80,6 +83,9 @@ class Button(DrawThing):
             textpos.centerx = self.rect.centerx
             textpos.centery = self.rect.centery
             self.surface_ref.blit(self.text, textpos)
+
+    def press(self):
+        print "[%s] pressed" % (self.text_raw,)
 
     def get(self):
         return (self.rect.x, self.rect.y, self.rect.w, self.rect.h)
@@ -113,13 +119,22 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+            if event.type == pygame.MOUSEBUTTONUP:
+                mouse_pos = pygame.mouse.get_pos()
+                for thing in draw_queue:
+                    if thing.can_press:
+                        (x1, y1, x2, y2) = thing.get()
+                        if x1+x2 >= mouse_pos[0] >= x1 and y1+y2 >= mouse_pos[1] >= y1:
+                            thing.press()
 
         screen.blit(background, (0, 0))
-        mouse = pygame.mouse.get_pos()
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()[0]
         for thing in draw_queue:
+            # Draw things
             if thing.can_highlight:
                 (x1, y1, x2, y2) = thing.get()
-                if x1+x2 >= mouse[0] >= x1 and y1+y2 >= mouse[1] >= y1:
+                if x1+x2 >= mouse_pos[0] >= x1 and y1+y2 >= mouse_pos[1] >= y1:
                     thing.draw(highlight=True)
                 else:
                     thing.draw()
