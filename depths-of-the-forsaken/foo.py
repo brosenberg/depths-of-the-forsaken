@@ -6,6 +6,30 @@ import pygame
 FONT="fonts/Cousine-Regular.ttf"
 
 
+class View(object):
+    def __init__(self):
+        self.draw_queue = []
+
+    def draw(self, mouse_pos):
+        for thing in self.draw_queue:
+            if thing.can_highlight:
+                (x1, y1, x2, y2) = thing.get()
+                if x1+x2 >= mouse_pos[0] >= x1 and y1+y2 >= mouse_pos[1] >= y1:
+                    thing.draw(highlight=True)
+                else:
+                    thing.draw()
+            else:
+                thing.draw()
+
+    def press(self, mouse_pos):
+        events = []
+        for thing in self.draw_queue:
+            if thing.can_press:
+                (x1, y1, x2, y2) = thing.get()
+                if x1+x2 >= mouse_pos[0] >= x1 and y1+y2 >= mouse_pos[1] >= y1:
+                    events.append(thing.press())
+        return events
+
 class DrawThing(object):
     def __init__(self):
         # If this thing will change if the cursor hovers over it.
@@ -16,6 +40,7 @@ class DrawThing(object):
 
     def draw(self):
         pass
+
 
 class Text(DrawThing):
     def __init__(self, surface_ref, string, **kwargs):
@@ -45,11 +70,12 @@ class Text(DrawThing):
             offset += self.font_size+1
 
 class Button(DrawThing):
-    def __init__(self, surface_ref, x_pos, y_pos, x_size, y_size, **kwargs):
+    def __init__(self, name, surface_ref, x_pos, y_pos, x_size, y_size, **kwargs):
         super(self.__class__, self).__init__()
         self.can_highlight = True
         self.can_press = True
 
+        self.name = name
         self.surface_ref = surface_ref
 
         self.rect = pygame.Rect(x_pos, y_pos, x_size, y_size)
@@ -67,10 +93,8 @@ class Button(DrawThing):
             self.font = pygame.font.Font(font, font_size)
             self.text_color = kwargs.get("text_color", self.border_color)
             self.text = self.font.render(text, 1, self.text_color)
-            self.text_raw = text
         else:
             self.text = None
-            self.text_raw = None
 
     def draw(self, highlight=False):
         self.surface_ref.fill(self.border_color, self.rect)
@@ -85,7 +109,7 @@ class Button(DrawThing):
             self.surface_ref.blit(self.text, textpos)
 
     def press(self):
-        print "[%s] pressed" % (self.text_raw,)
+        return self.name
 
     def get(self):
         return (self.rect.x, self.rect.y, self.rect.w, self.rect.h)
@@ -104,45 +128,59 @@ def main():
     screen.blit(background, (0, 0))
     pygame.display.flip()
 
+    views = {}
+    current_view = "main menu"
 
-    draw_queue = []
-
-    draw_queue.append(Button(background, 50, 520, 200, 30, text="Create Character"))
-    draw_queue.append(Button(background, 300, 520, 200, 30, text="Continue"))
-    draw_queue.append(Button(background, 550, 520, 200, 30, text="Flee to DOS"))
+    # Main Menu ########
+    views["main menu"] = View()
+    views["main menu"].draw_queue.append(Button("create", background, 50, 520, 200, 30, text="Create Character"))
+    views["main menu"].draw_queue.append(Button("load screen", background, 300, 520, 200, 30, text="Continue"))
+    views["main menu"].draw_queue.append(Button("quit", background, 550, 520, 200, 30, text="Flee to DOS"))
 
     s = open("banner").read()
-    draw_queue.append(Text(background, s, font=FONT, font_size=10, font_color=(200, 0, 0),
-                           centerx=background.get_rect().centerx, centery=15))
+    t = Text(background, s, font_size=10, font_color=(200, 0, 0),
+             centerx=background.get_rect().centerx, centery=15)
+    views["main menu"].draw_queue.append(t)
 
+    # Load Screen ######
+    views["load screen"] = View()
+    views["load screen"].draw_queue.append(Button("load", background, 50, 520, 200, 30, text="Load"))
+    views["load screen"].draw_queue.append(Button("main menu", background, 300, 520, 200, 30, text="Main Menu"))
+    views["load screen"].draw_queue.append(Button("quit", background, 550, 520, 200, 30, text="Flee to DOS"))
+
+    t = Text(background, "Load Game", centerx=background.get_rect().centerx, centery=30)
+    views["load screen"].draw_queue.append(t)
+    
+    screen_dirty = False
     while True:
+        view_events = []
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
             if event.type == pygame.MOUSEBUTTONUP:
-                mouse_pos = pygame.mouse.get_pos()
-                for thing in draw_queue:
-                    if thing.can_press:
-                        (x1, y1, x2, y2) = thing.get()
-                        if x1+x2 >= mouse_pos[0] >= x1 and y1+y2 >= mouse_pos[1] >= y1:
-                            thing.press()
+                view_events += views[current_view].press(pygame.mouse.get_pos())
 
         screen.blit(background, (0, 0))
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_pressed = pygame.mouse.get_pressed()[0]
-        for thing in draw_queue:
-            # Draw things
-            if thing.can_highlight:
-                (x1, y1, x2, y2) = thing.get()
-                if x1+x2 >= mouse_pos[0] >= x1 and y1+y2 >= mouse_pos[1] >= y1:
-                    thing.draw(highlight=True)
-                else:
-                    thing.draw()
-            else:
-                thing.draw()
+        views[current_view].draw(pygame.mouse.get_pos())
 
-        # FIXME: Call update() on each changed thing
-        pygame.display.update()
+        for event in view_events:
+            if event == "quit":
+                return
+            if event == "load screen":
+                current_view = "load screen"
+                screen_dirty = True
+            if event == "main menu":
+                current_view = "main menu"
+                screen_dirty = True
+
+        if screen_dirty:
+            background.fill((0, 0, 0))
+            pygame.display.flip()
+            screen_dirty = False
+        else:
+            # FIXME: Call update() on each changed thing
+            pygame.display.update()
+
         clock.tick(15)
 
 if __name__ == '__main__':
