@@ -42,6 +42,7 @@ class DrawThing(object):
         pass
 
 
+# FIXME: Add left and right justification.
 class Text(DrawThing):
     def __init__(self, surface_ref, string, **kwargs):
         super(self.__class__, self).__init__()
@@ -53,6 +54,8 @@ class Text(DrawThing):
         self.font_size = kwargs.get("font_size", 20)
         self.font = pygame.font.Font(font, self.font_size)
         self.font_color = kwargs.get("font_color", (240, 240, 240))
+        self.fill_bg = kwargs.get("fill_bg", True)
+        self.bg_color = kwargs.get("bg_color", (0, 0, 0))
         self.centerx = kwargs.get("centerx")
         self.centery = kwargs.get("centery")
 
@@ -66,17 +69,20 @@ class Text(DrawThing):
             if self.centery:
                 textpos.centery = self.centery
             textpos[1] += offset
+            if self.fill_bg:
+                self.surface_ref.fill(self.bg_color, textpos)
             self.surface_ref.blit(text, textpos)
             offset += self.font_size+1
 
 class Button(DrawThing):
-    def __init__(self, name, surface_ref, x_pos, y_pos, x_size, y_size, **kwargs):
+    def __init__(self, surface_ref, x_pos, y_pos, x_size, y_size, **kwargs):
         super(self.__class__, self).__init__()
         self.can_highlight = True
         self.can_press = True
 
-        self.name = name
         self.surface_ref = surface_ref
+
+        self.press_action = kwargs.get("press_action", None)
 
         self.rect = pygame.Rect(x_pos, y_pos, x_size, y_size)
         self.inner_rect = self.rect.copy()
@@ -105,11 +111,11 @@ class Button(DrawThing):
         if self.text:
             textpos = self.text.get_rect()
             textpos.centerx = self.rect.centerx
-            textpos.centery = self.rect.centery
+            textpos.centery = self.rect.centery+1
             self.surface_ref.blit(self.text, textpos)
 
     def press(self):
-        return self.name
+        return self.press_action
 
     def get(self):
         return (self.rect.x, self.rect.y, self.rect.w, self.rect.h)
@@ -131,25 +137,53 @@ def main():
     views = {}
     current_view = "main menu"
 
+    # These should really be in template files or something
+
     # Main Menu ########
     views["main menu"] = View()
-    views["main menu"].draw_queue.append(Button("create", background, 50, 520, 200, 30, text="Create Character"))
-    views["main menu"].draw_queue.append(Button("load screen", background, 300, 520, 200, 30, text="Continue"))
-    views["main menu"].draw_queue.append(Button("quit", background, 550, 520, 200, 30, text="Flee to DOS"))
+    views["main menu"].draw_queue.append(Button(background, 50, 520, 200, 30,
+                                                press_action="view:create char", text="Create Character"))
+    views["main menu"].draw_queue.append(Button(background, 300, 520, 200, 30,
+                                                press_action="view:load screen", text="Continue"))
+    views["main menu"].draw_queue.append(Button(background, 550, 520, 200, 30,
+                                                press_action="quit", text="Flee to DOS"))
 
     s = open("banner").read()
-    t = Text(background, s, font_size=10, font_color=(200, 0, 0),
+    t = Text(background, s, font_size=10, font_color=(240, 0, 0),
              centerx=background.get_rect().centerx, centery=15)
     views["main menu"].draw_queue.append(t)
 
     # Load Screen ######
     views["load screen"] = View()
-    views["load screen"].draw_queue.append(Button("load", background, 50, 520, 200, 30, text="Load"))
-    views["load screen"].draw_queue.append(Button("main menu", background, 300, 520, 200, 30, text="Main Menu"))
-    views["load screen"].draw_queue.append(Button("quit", background, 550, 520, 200, 30, text="Flee to DOS"))
+    views["load screen"].draw_queue.append(Button(background, 50, 520, 200, 30,
+                                                  press_action="load", text="Load"))
+    views["load screen"].draw_queue.append(Button(background, 300, 520, 200, 30,
+                                                  press_action="view:main menu", text="Main Menu"))
+    views["load screen"].draw_queue.append(Button(background, 550, 520, 200, 30,
+                                                  press_action="quit", text="Flee to DOS"))
 
     t = Text(background, "Load Game", centerx=background.get_rect().centerx, centery=30)
     views["load screen"].draw_queue.append(t)
+
+    # Character Creation ##
+    views["create char"] = View()
+    views["create char"].draw_queue.append(Button(background, 50, 520, 200, 30,
+                                                  press_action="save", text="Save"))
+    views["create char"].draw_queue.append(Button(background, 300, 520, 200, 30,
+                                                  press_action="view:main menu", text="Main Menu"))
+    views["create char"].draw_queue.append(Button(background, 550, 520, 200, 30,
+                                                  press_action="quit", text="Flee to DOS"))
+
+    t = Text(background, "Character Creation", centerx=background.get_rect().centerx, centery=30)
+    views["create char"].draw_queue.append(t)
+
+    s = "TGH\nAGI\nPER\nINT\nWIL\nCHA\nLUC"
+    t = Text(background, s, centerx=45, centery=100)
+    views["create char"].draw_queue.append(t)
+
+    s = "HP\nFatigue\nAP\nSP"
+    t = Text(background, s, centerx=345, centery=100)
+    views["create char"].draw_queue.append(t)
     
     screen_dirty = False
     while True:
@@ -164,13 +198,16 @@ def main():
         views[current_view].draw(pygame.mouse.get_pos())
 
         for event in view_events:
-            if event == "quit":
+            if event is None:
+                continue
+            try:
+                (event_type, event_action) = event.split(':')
+            except ValueError:
+                event_type = event
+            if event_type == "quit":
                 return
-            if event == "load screen":
-                current_view = "load screen"
-                screen_dirty = True
-            if event == "main menu":
-                current_view = "main menu"
+            if event_type == "view":
+                current_view = event_action
                 screen_dirty = True
 
         if screen_dirty:
@@ -181,7 +218,7 @@ def main():
             # FIXME: Call update() on each changed thing
             pygame.display.update()
 
-        clock.tick()
+        #clock.tick()
 
 if __name__ == '__main__':
     main()
