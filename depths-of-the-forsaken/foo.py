@@ -42,7 +42,6 @@ class DrawThing(object):
         pass
 
 
-# FIXME: Add left and right justification.
 class Text(DrawThing):
     def __init__(self, surface_ref, string, **kwargs):
         super(self.__class__, self).__init__()
@@ -56,8 +55,11 @@ class Text(DrawThing):
         self.font_color = kwargs.get("font_color", (240, 240, 240))
         self.fill_bg = kwargs.get("fill_bg", True)
         self.bg_color = kwargs.get("bg_color", (0, 0, 0))
+
         self.centerx = kwargs.get("centerx")
         self.centery = kwargs.get("centery")
+        self.left = kwargs.get("left")
+        self.right = kwargs.get("right")
 
     def draw(self):
         offset = 0
@@ -68,6 +70,10 @@ class Text(DrawThing):
                 textpos.centerx = self.centerx
             if self.centery:
                 textpos.centery = self.centery
+            if self.right:
+                textpos.right = self.right
+            if self.left:
+                textpos.left = self.left
             textpos[1] += offset
             if self.fill_bg:
                 self.surface_ref.fill(self.bg_color, textpos)
@@ -182,7 +188,7 @@ def main():
     views["create char"].draw_queue.append(t)
 
     s = "HP\nFatigue\nAP\nSP"
-    t = Text(background, s, centerx=345, centery=100)
+    t = Text(background, s, right=345, centery=100)
     views["create char"].draw_queue.append(t)
     
     screen_dirty = False
