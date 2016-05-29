@@ -181,7 +181,7 @@ def main():
             # FIXME: Call update() on each changed thing
             pygame.display.update()
 
-        clock.tick(15)
+        clock.tick()
 
 if __name__ == '__main__':
     main()
