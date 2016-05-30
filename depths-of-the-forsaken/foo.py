@@ -96,15 +96,15 @@ class Button(DrawThing):
 
         self.border_color = kwargs.get("border_color", (0, 200, 0))
         self.bg_color = kwargs.get("bg_color", (0, 0, 0))
-        self.highlight_color = kwargs.get("border_color", (0, 100, 0))
+        self.highlight_color = kwargs.get("highlight_color", (0, 100, 0))
 
         text = kwargs.get("text")
         if text:
             font = kwargs.get("font", FONT)
             font_size = kwargs.get("font_size", 20)
             self.font = pygame.font.Font(font, font_size)
-            self.text_color = kwargs.get("text_color", self.border_color)
-            self.text = self.font.render(text, 1, self.text_color)
+            self.font_color = kwargs.get("font_color", self.border_color)
+            self.text = self.font.render(text, 1, self.font_color)
         else:
             self.text = None
 
@@ -184,12 +184,50 @@ def main():
     views["create char"].draw_queue.append(t)
 
     s = "TGH\nAGI\nPER\nINT\nWIL\nCHA\nLUC"
-    t = Text(background, s, centerx=45, centery=100)
+    t = Text(background, s, left=50, centery=100)
     views["create char"].draw_queue.append(t)
 
     s = "HP\nFatigue\nAP\nSP"
-    t = Text(background, s, right=345, centery=100)
+    t = Text(background, s, left=345, centery=100)
     views["create char"].draw_queue.append(t)
+
+    # Combat Screen ####
+    views["combat screen"] = View()
+
+    t = Text(background, "Actions", centerx=80, centery=280)
+    views["combat screen"].draw_queue.append(t)
+
+    offset = 0
+    for action in ["approach", "attack", "run", "wait", "withdraw"]:
+        press_action = "combat:%s" % (action,)
+        text = action.title()
+        views["combat screen"].draw_queue.append(Button(background, 30, 300+offset, 100, 30,
+                                                    press_action=press_action, text=text))
+        offset += 35
+
+    t = Text(background, "Combat!", centerx=background.get_rect().centerx, centery=30)
+    views["combat screen"].draw_queue.append(t)
+
+    # Debug Screen #####
+    views["debug"] = View()
+    views["debug"].draw_queue.append(Button(background, 440, 60, 200, 30,
+                                            press_action="quit", text="Quit"))
+    t = Text(background, "Views", centerx=130, centery=40)
+    views["debug"].draw_queue.append(t)
+    offset = 0
+    for view in views:
+        press_action = "view:%s" % (view,)
+        text = view.title()
+        views["debug"].draw_queue.append(Button(background, 30, 60+offset, 200, 30,
+                                                press_action=press_action, text=text))
+        offset += 35
+
+        mid = background.get_rect().right-25
+        bot = background.get_rect().bottom-25
+        views[view].draw_queue.append(Button(background, mid, bot, 25, 25,
+                                             font_size=14, font_color=(45, 45, 45),
+                                             border_color=(0, 0, 0), highlight_color=(100, 0, 0),
+                                             press_action="view:debug", text=u'\u03C0'))
     
     screen_dirty = False
     while True:
@@ -213,8 +251,9 @@ def main():
             if event_type == "quit":
                 return
             if event_type == "view":
-                current_view = event_action
-                screen_dirty = True
+                if views.get(event_action):
+                    current_view = event_action
+                    screen_dirty = True
 
         if screen_dirty:
             background.fill((0, 0, 0))
